@@ -15,7 +15,7 @@ export class AppHome {
   private projects: Project[] = [
     {
       name: 'Ultima Online Outlands',
-      description: 'A player-driven, open-world shard of Ultima Online with a harsh survival economy and full-loot PvP.',
+      description: 'Guides and scripts for UO Outlands',
       url: '/uo-outlands/',
       image: '/assets/projects/uo-outlands.svg',
     },
@@ -43,7 +43,7 @@ export class AppHome {
                       <div
                         class="project-card-image"
                         style={{
-                          backgroundImage: `linear-gradient(to bottom, transparent 50%, var(--bulma-box-background-color) 100%), url(${project.image})`,
+                          backgroundImage: `url(${project.image})`,
                         }}
                       ></div>
                     )}

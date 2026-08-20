@@ -15,10 +15,19 @@ a.project-card {
 }
 
 .project-card-image {
+  position: relative;
   flex: 0 0 20%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+.project-card-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, transparent 50%, var(--bulma-box-background-color) 100%);
+  pointer-events: none;
 }
 
 .project-card-content {
