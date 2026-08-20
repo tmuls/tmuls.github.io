@@ -4,6 +4,7 @@ interface Project {
   name: string;
   description: string;
   url: string;
+  image?: string;
 }
 
 @Component({
@@ -13,14 +14,10 @@ interface Project {
 export class AppHome {
   private projects: Project[] = [
     {
-      name: 'Project One',
-      description: 'A short description of this project goes here.',
-      url: '#',
-    },
-    {
-      name: 'Project Two',
-      description: 'A short description of this project goes here.',
-      url: '#',
+      name: 'Ultima Online Outlands',
+      description: 'A player-driven, open-world shard of Ultima Online with a harsh survival economy and full-loot PvP.',
+      url: '/uo-outlands/',
+      image: '/assets/projects/uo-outlands.svg',
     },
   ];
 
@@ -40,10 +37,20 @@ export class AppHome {
             <h2 class="title is-4 has-text-light">Projects</h2>
             <div class="columns is-multiline">
               {this.projects.map((project) => (
-                <div class="column is-one-third">
+                <div class="column is-half">
                   <a class="box project-card" href={project.url}>
-                    <p class="title is-5">{project.name}</p>
-                    <p class="subtitle is-6">{project.description}</p>
+                    {project.image && (
+                      <div
+                        class="project-card-image"
+                        style={{
+                          backgroundImage: `linear-gradient(to bottom, transparent 50%, var(--bulma-box-background-color) 100%), url(${project.image})`,
+                        }}
+                      ></div>
+                    )}
+                    <div class="project-card-content">
+                      <p class="title is-5">{project.name}</p>
+                      <p class="subtitle is-6">{project.description}</p>
+                    </div>
                   </a>
                 </div>
               ))}

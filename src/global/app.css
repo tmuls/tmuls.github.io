@@ -1,1 +1,39 @@
 @import '../../node_modules/bulma/css/bulma.min.css';
+
+/* Shared site theme: dark background with a subtle repeating noise texture.
+   Used by every page (Stencil-rendered or plain static) so the look stays consistent. */
+html,
+body {
+  margin: 0;
+}
+
+html {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #17191d;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: transparent;
+}
+
+.site-navbar {
+  background: transparent !important;
+  box-shadow: none;
+  padding: 0.5rem 1rem;
+}
+
+.site-title {
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  color: #f5f5f5 !important;
+}
+
+.site-title:hover {
+  color: #ffffff !important;
+}
