@@ -17,7 +17,10 @@ a.project-card {
 
 .project-card-image {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 20%;
   z-index: 0;
   background-size: cover;
   background-position: left center;
@@ -28,7 +31,7 @@ a.project-card {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to right, transparent 0%, var(--bulma-box-background-color) 65%);
+  background-image: linear-gradient(to right, transparent 0%, var(--bulma-box-background-color) 100%);
 }
 
 .project-card-content {
