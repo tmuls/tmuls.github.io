@@ -3,10 +3,11 @@
 }
 
 a.project-card {
-  display: flex;
-  align-items: stretch;
-  padding: 0;
+  position: relative;
+  display: block;
   overflow: hidden;
+  border-radius: 14px;
+  min-height: 150px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -15,10 +16,11 @@ a.project-card {
 }
 
 .project-card-image {
-  position: relative;
-  flex: 0 0 20%;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   background-size: cover;
-  background-position: center;
+  background-position: left center;
   background-repeat: no-repeat;
 }
 
@@ -26,12 +28,11 @@ a.project-card {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to right, transparent 50%, var(--bulma-box-background-color) 100%);
-  pointer-events: none;
+  background-image: linear-gradient(to right, transparent 0%, var(--bulma-box-background-color) 65%);
 }
 
 .project-card-content {
-  flex: 1 1 auto;
-  min-width: 0;
+  position: relative;
+  z-index: 1;
   padding: 1.25rem;
 }
