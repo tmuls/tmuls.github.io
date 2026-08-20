@@ -47,6 +47,7 @@ export class AppHome {
                         }}
                       ></div>
                     )}
+                    {project.image && <div class="project-card-fade"></div>}
                     <div class="project-card-content">
                       <p class="title is-5">{project.name}</p>
                       <p class="subtitle is-6">{project.description}</p>
