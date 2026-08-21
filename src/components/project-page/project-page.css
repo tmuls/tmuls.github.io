@@ -1,9 +1,40 @@
 .project-hero {
   position: relative;
   min-height: 420px;
+  overflow: hidden;
+}
+
+/* Layer 1 (deepest): nothing painted here — the page's own textured
+   html background shows straight through, so it lines up with the
+   section below with no seam. */
+
+/* Layer 2: the artwork, filling the hero, masked to fade to transparent
+   toward the bottom so it blends into the shared page background. */
+.hero-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   background-size: cover;
   background-position: center;
-  background-color: #17191d;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+}
+
+/* Layer 3: a dark scrim over the art (for text legibility), also fading
+   to fully transparent — never to a flat color — so nothing occludes
+   the shared textured background underneath. */
+.hero-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: linear-gradient(180deg, rgba(20, 22, 26, 0.6) 0%, rgba(20, 22, 26, 0.4) 40%, transparent 70%);
+}
+
+/* Layer 4 (topmost): the text. */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  min-height: 420px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -28,6 +59,10 @@
 
 @media (max-width: 600px) {
   .project-hero {
+    min-height: 300px;
+  }
+
+  .hero-content {
     min-height: 300px;
     padding: 1.5rem 0 2rem;
   }
