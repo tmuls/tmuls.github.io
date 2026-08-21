@@ -17,6 +17,8 @@ export namespace Components {
     }
     interface GuideView {
     }
+    interface LatestRelease {
+    }
     interface ProjectPage {
         "heroImage"?: string;
         /**
@@ -57,6 +59,12 @@ declare global {
         prototype: HTMLGuideViewElement;
         new (): HTMLGuideViewElement;
     };
+    interface HTMLLatestReleaseElement extends Components.LatestRelease, HTMLStencilElement {
+    }
+    var HTMLLatestReleaseElement: {
+        prototype: HTMLLatestReleaseElement;
+        new (): HTMLLatestReleaseElement;
+    };
     interface HTMLProjectPageElement extends Components.ProjectPage, HTMLStencilElement {
     }
     var HTMLProjectPageElement: {
@@ -69,6 +77,7 @@ declare global {
         "app-nav": HTMLAppNavElement;
         "guide-list": HTMLGuideListElement;
         "guide-view": HTMLGuideViewElement;
+        "latest-release": HTMLLatestReleaseElement;
         "project-page": HTMLProjectPageElement;
     }
 }
@@ -83,6 +92,8 @@ declare namespace LocalJSX {
         "project"?: string;
     }
     interface GuideView {
+    }
+    interface LatestRelease {
     }
     interface ProjectPage {
         "heroImage"?: string;
@@ -108,6 +119,7 @@ declare namespace LocalJSX {
         "app-nav": AppNav;
         "guide-list": Omit<GuideList, keyof GuideListAttributes> & { [K in keyof GuideList & keyof GuideListAttributes]?: GuideList[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `attr:${K}`]?: GuideListAttributes[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `prop:${K}`]?: GuideList[K] };
         "guide-view": GuideView;
+        "latest-release": LatestRelease;
         "project-page": Omit<ProjectPage, keyof ProjectPageAttributes> & { [K in keyof ProjectPage & keyof ProjectPageAttributes]?: ProjectPage[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `attr:${K}`]?: ProjectPageAttributes[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `prop:${K}`]?: ProjectPage[K] };
     }
 }
@@ -120,6 +132,7 @@ declare module "@stencil/core" {
             "app-nav": LocalJSX.IntrinsicElements["app-nav"] & JSXBase.HTMLAttributes<HTMLAppNavElement>;
             "guide-list": LocalJSX.IntrinsicElements["guide-list"] & JSXBase.HTMLAttributes<HTMLGuideListElement>;
             "guide-view": LocalJSX.IntrinsicElements["guide-view"] & JSXBase.HTMLAttributes<HTMLGuideViewElement>;
+            "latest-release": LocalJSX.IntrinsicElements["latest-release"] & JSXBase.HTMLAttributes<HTMLLatestReleaseElement>;
             "project-page": LocalJSX.IntrinsicElements["project-page"] & JSXBase.HTMLAttributes<HTMLProjectPageElement>;
         }
     }
