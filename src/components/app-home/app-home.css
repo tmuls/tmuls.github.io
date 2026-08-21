@@ -40,3 +40,24 @@ a.project-card {
   z-index: 2;
   padding: 1.25rem;
 }
+
+.youtube-button {
+  margin-top: 1.75rem;
+  background-color: #14161a;
+  border: 1px solid #2a2d33;
+  border-radius: 999px;
+  color: #f5f5f5;
+  padding: 0.6rem 1.4rem;
+  height: auto;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.youtube-button:hover {
+  background-color: #1c1f25;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.youtube-button .icon {
+  margin-right: 0.5rem;
+}

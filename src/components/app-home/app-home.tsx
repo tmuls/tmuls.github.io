@@ -56,6 +56,16 @@ export class AppHome {
                 </div>
               ))}
             </div>
+
+            <a class="button youtube-button" href="https://www.youtube.com/@e_muls" target="_blank" rel="noopener noreferrer">
+              <span class="icon">
+                <svg viewBox="0 0 48 34" width="22" height="16" aria-hidden="true">
+                  <rect width="48" height="34" rx="10" fill="#ff0000"></rect>
+                  <path d="M20 10l14 7-14 7V10z" fill="#ffffff"></path>
+                </svg>
+              </span>
+              <span>YouTube</span>
+            </a>
           </div>
         </section>
       </Host>
