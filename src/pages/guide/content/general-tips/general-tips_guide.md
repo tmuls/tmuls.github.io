@@ -1,5 +1,4 @@
 ---
-id: general-tips
 title: Dexxer General Tips
 project: uo
 ---

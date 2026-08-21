@@ -1,5 +1,4 @@
 ---
-id: wrestler
 title: Wrestler
 project: uo
 ---

@@ -6,14 +6,6 @@ interface SidebarEntry {
   props?: Record<string, any>;
 }
 
-interface GuideIndexEntry {
-  id: string;
-  title: string;
-  project?: string;
-  excerpt: string;
-  sidebar?: SidebarEntry[];
-}
-
 const PROJECT_HOME: Record<string, string> = {
   uo: '/uo/',
 };
@@ -26,6 +18,23 @@ function renderSidebarEntry(entry: SidebarEntry) {
     default:
       return null;
   }
+}
+
+function parseFrontmatter(raw: string): { data: Record<string, string>; body: string } {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!match) {
+    return { data: {}, body: raw };
+  }
+  const [, frontmatter, body] = match;
+  const data: Record<string, string> = {};
+  for (const line of frontmatter.split(/\r?\n/)) {
+    const idx = line.indexOf(':');
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    const value = line.slice(idx + 1).trim();
+    data[key] = value;
+  }
+  return { data, body: body.replace(/^\r?\n+/, '') };
 }
 
 const YOUTUBE_RE = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/g;
@@ -74,25 +83,26 @@ export class GuideView {
     }
 
     try {
-      const [indexRes, mdRes] = await Promise.all([
-        fetch('/assets/guides/index.json', { cache: 'no-cache' }),
-        fetch(`/assets/guides/${id}.md`, { cache: 'no-cache' }),
-      ]);
-
+      const mdRes = await fetch(`/assets/guides/${id}/${id}_guide.md`, { cache: 'no-cache' });
       if (!mdRes.ok) {
         throw new Error('Guide not found');
       }
 
-      const index: GuideIndexEntry[] = indexRes.ok ? await indexRes.json() : [];
-      const entry = index.find((g) => g.id === id);
-
-      this.title = entry ? entry.title : id;
-      this.backUrl = entry && entry.project && PROJECT_HOME[entry.project] ? PROJECT_HOME[entry.project] : '/';
-      this.sidebar = entry?.sidebar || [];
-
       const raw = await mdRes.text();
-      this.videoIds = extractYoutubeIds(raw);
-      this.html = markExternalLinks(marked.parse(raw) as string);
+      const { data, body } = parseFrontmatter(raw);
+
+      this.title = data.title || id;
+      this.backUrl = data.project && PROJECT_HOME[data.project] ? PROJECT_HOME[data.project] : '/';
+      this.videoIds = extractYoutubeIds(body);
+      this.html = markExternalLinks(marked.parse(body) as string);
+
+      try {
+        const sidebarRes = await fetch(`/assets/guides/${id}/${id}_sidebar.json`, { cache: 'no-cache' });
+        this.sidebar = sidebarRes.ok ? await sidebarRes.json() : [];
+      } catch (e) {
+        this.sidebar = [];
+      }
+
       this.status = 'ready';
 
       if (typeof document !== 'undefined') {
