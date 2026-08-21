@@ -3,9 +3,8 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "prebuild": "node scripts/build-guides.mjs",
     "build": "stencil build",
-    "postbuild": "node scripts/cache-bust.mjs",
+    "postbuild": "node scripts/build-guides.mjs && node scripts/cache-bust.mjs",
     "start": "stencil build --dev --watch --serve"
   },
   "devDependencies": {

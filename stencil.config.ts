@@ -7,8 +7,8 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null,
-      dir: '.',
-      empty: false,
+      dir: 'www',
+      empty: true,
       copy: [
         { src: 'pages/uo/index.html', dest: 'uo/index.html' },
         { src: 'pages/guide/index.html', dest: 'guide/index.html' },

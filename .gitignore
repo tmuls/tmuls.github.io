@@ -2,5 +2,5 @@ node_modules/
 dist/
 loader/
 .stencil/
-www/index.html.orig
+www/
 *.log

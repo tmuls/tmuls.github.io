@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, unlink
 import { join } from 'node:path';
 
 const guidesDir = 'src/pages/guide/content';
-const outDir = 'assets/guides';
+const outDir = 'www/assets/guides';
 
 function parseFrontmatter(raw) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
