@@ -9,6 +9,10 @@ export const config: Config = {
       serviceWorker: null,
       dir: '.',
       empty: false,
+      copy: [
+        { src: 'pages/uo/index.html', dest: 'uo/index.html' },
+        { src: 'pages/guide/index.html', dest: 'guide/index.html' },
+      ],
     },
   ],
 };

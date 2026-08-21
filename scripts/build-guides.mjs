@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 
-const guidesDir = 'guides';
+const guidesDir = 'src/pages/uo/guides';
 const outDir = 'assets/guides';
 
 function parseFrontmatter(raw) {
