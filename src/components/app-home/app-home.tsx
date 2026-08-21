@@ -20,9 +20,6 @@ export class AppHome {
       url: '/uo-outlands/',
       image: '/assets/projects/uo-outlands.svg?v=2',
     },
-  ];
-
-  private links: CardItem[] = [
     {
       name: 'YouTube',
       description: 'Video guides and gameplay',
@@ -66,9 +63,6 @@ export class AppHome {
           <div class="container">
             <h2 class="title is-4 has-text-light">Projects</h2>
             <div class="columns is-multiline">{this.projects.map((project) => this.renderCard(project))}</div>
-
-            <h2 class="title is-4 has-text-light mt-5">Links</h2>
-            <div class="columns is-multiline">{this.links.map((link) => this.renderCard(link))}</div>
           </div>
         </section>
       </app-layout>
