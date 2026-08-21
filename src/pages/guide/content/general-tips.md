@@ -20,3 +20,29 @@ project: uo
 ### Other Things
 * **Builds are tested at 30 links, T15 aspect, 10+ redline points**  If lower aspect, see the section on accuracy.  If you don't like how it plays, consider something else.  Builds are still playable without redline so don't worry about that.
 * **These are just the builds I play,** I have no idea if they are "the best" or not but they work well for me.
+
+## Specialty Codex Loadouts
+
+### Alchemy Codex
+Alchemy kit is where you will get a lot of your survivability + a little bit of damage from Acrid.  Building it for explosion damage at 80 alchemy is not worth it.
+
+* Bandolier - 3
+* Panacea - 3
+* Elixir - 3
+* Mixed Results - 3
+
+**IF POISONING** Add 2 points into Acrid and take 1 point in Mixed Results, 1 point in Freedom
+
+### Healing Codex
+There is a lot of flexibility here, but this is what I use.
+
+* Combat Medic - 2
+* Immunize - 2
+* Pressure Points - 3
+* Triage - 2
+* Self Treatment - 3
+* Specialist - 1
+
+If you plan on fighting high level mobs with big diseases or bleeds (most level 4 dungeons) I would suggest dropping combat medic to level 1 and maxing out immunize.
+
+You may also consider dropping combat medic altogether (see damage resistance soft cap) and maxing out self treatment.  This will give you an extra point which you could throw into immunize along with the point from specialist, or throw it into overheal level 1.
