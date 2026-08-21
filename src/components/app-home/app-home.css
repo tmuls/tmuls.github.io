@@ -6,7 +6,7 @@ a.project-card {
   position: relative;
   display: block;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 32px;
   min-height: 150px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
