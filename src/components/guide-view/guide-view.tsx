@@ -55,6 +55,26 @@ function markExternalLinks(html: string): string {
   return wrapper.innerHTML;
 }
 
+// Remembers each sidebar entry's expanded/collapsed state per guide, so
+// re-opening a guide keeps it the way it was left. Keyed by the guide's id
+// plus the entry's position in its sidebar, since entries don't otherwise
+// carry an id of their own.
+function sidebarStorageKey(guideId: string, index: number): string {
+  return `guide-sidebar-expanded:${guideId}:${index}`;
+}
+
+function loadExpandedSidebar(guideId: string, count: number): boolean[] {
+  const expanded: boolean[] = [];
+  for (let i = 0; i < count; i++) {
+    try {
+      expanded.push(localStorage.getItem(sidebarStorageKey(guideId, i)) === 'true');
+    } catch (e) {
+      expanded.push(false);
+    }
+  }
+  return expanded;
+}
+
 // Renders one guide's content, given its id. Assumes that id is a leaf
 // (a folder holding "<name>_guide.md") - deciding whether an id is a guide
 // or a folder listing is guide-page's job, not this component's.
@@ -73,7 +93,14 @@ export class GuideView {
   @State() status: 'loading' | 'ready' | 'error' = 'loading';
 
   private toggleSidebarEntry(index: number) {
-    this.expandedSidebar = this.expandedSidebar.map((expanded, i) => (i === index ? !expanded : expanded));
+    const next = !this.expandedSidebar[index];
+    this.expandedSidebar = this.expandedSidebar.map((expanded, i) => (i === index ? next : expanded));
+    try {
+      localStorage.setItem(sidebarStorageKey(this.guideId, index), String(next));
+    } catch (e) {
+      // localStorage unavailable (private browsing, etc.) - the toggle
+      // still works, it just won't be remembered next visit.
+    }
   }
 
   private playVideo(videoId: string) {
@@ -102,7 +129,7 @@ export class GuideView {
       } catch (e) {
         this.sidebar = [];
       }
-      this.expandedSidebar = this.sidebar.map(() => false);
+      this.expandedSidebar = loadExpandedSidebar(this.guideId, this.sidebar.length);
 
       this.status = 'ready';
 
