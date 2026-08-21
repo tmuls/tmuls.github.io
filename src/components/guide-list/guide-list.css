@@ -1,0 +1,29 @@
+.guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.guide-entry {
+  padding: 1.25rem 1.5rem;
+  background-color: #14161a;
+  border: 1px solid #2a2d33;
+  border-radius: 16px;
+}
+
+.guide-excerpt {
+  margin-top: 0.35rem;
+  line-height: 1.5;
+}
+
+.guide-read-more {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #c9a45c;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.guide-read-more:hover {
+  color: #e0c07c;
+}

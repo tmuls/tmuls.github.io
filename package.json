@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
+    "prebuild": "node scripts/build-guides.mjs",
     "build": "stencil build",
     "start": "stencil build --dev --watch --serve"
   },
@@ -10,6 +11,7 @@
     "@stencil/core": "^4.20.0"
   },
   "dependencies": {
-    "bulma": "^1.0.4"
+    "bulma": "^1.0.4",
+    "marked": "^18.0.10"
   }
 }
