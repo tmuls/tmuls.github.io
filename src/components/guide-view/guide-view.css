@@ -50,3 +50,73 @@
   height: 100%;
   border: 0;
 }
+
+/* Desktop: sidebar entries render as plain, always-open cards — no
+   collapsible chrome. */
+.sidebar-guide-toggle {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  /* Bulma's columns are only flex at this width — push the sidebar
+     (first in markup, so mobile stacking puts it on top for free) back
+     over to the right once there's room for two columns. */
+  .guide-sidebar-column {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Below flex width, .sidebar-column's shared mobile rule assumes it's
+     the second (lower) column; here it's first, so swap the spacing. */
+  .guide-sidebar-column {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-guide-item + .sidebar-guide-item {
+    margin-top: 0.75rem;
+  }
+
+  .sidebar-guide-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background-color: #14161a;
+    border: 1px solid #2a2d33;
+    border-radius: 16px;
+    color: #8a8d94;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+  }
+
+  .sidebar-guide-chevron {
+    transition: transform 0.15s ease;
+  }
+
+  .sidebar-guide-item.is-expanded .sidebar-guide-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Each sidebar component already renders its own label inside its
+     .sidebar-card — hide it here so the toggle button above isn't a
+     duplicate, and only show the card body once expanded. */
+  .sidebar-guide-body {
+    display: none;
+    margin-top: 0.75rem;
+  }
+
+  .sidebar-guide-item.is-expanded .sidebar-guide-body {
+    display: block;
+  }
+
+  .sidebar-guide-body .sidebar-card-label {
+    display: none;
+  }
+}

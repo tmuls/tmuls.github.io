@@ -21,6 +21,11 @@ function renderSidebarEntry(entry: SidebarEntry) {
   }
 }
 
+function sidebarEntryLabel(entry: SidebarEntry): string {
+  const props = entry.props || {};
+  return props.title || humanizeId(entry.component);
+}
+
 function backUrlFor(id: string): string {
   const segments = id.split('/');
   segments.pop();
@@ -82,7 +87,12 @@ export class GuideView {
   @State() videoIds: string[] = [];
   @State() backUrl = '/';
   @State() sidebar: SidebarEntry[] = [];
+  @State() expandedSidebar: boolean[] = [];
   @State() status: 'loading' | 'ready' | 'error' = 'loading';
+
+  private toggleSidebarEntry(index: number) {
+    this.expandedSidebar = this.expandedSidebar.map((expanded, i) => (i === index ? !expanded : expanded));
+  }
 
   async componentWillLoad() {
     const id = new URLSearchParams(window.location.search).get('id');
@@ -123,6 +133,7 @@ export class GuideView {
         } catch (e) {
           this.sidebar = [];
         }
+        this.expandedSidebar = this.sidebar.map(() => false);
 
         this.status = 'ready';
       }
@@ -186,14 +197,33 @@ export class GuideView {
 
             {this.status === 'ready' && this.mode === 'leaf' && this.sidebar.length > 0 && (
               <div class="columns">
-                <div class="column is-two-thirds">
-                  <article>{this.renderArticleBody()}</article>
-                </div>
-                <div class="column sidebar-column">
+                {/* Sidebar comes first in markup: below desktop width, Bulma's
+                    columns aren't flex at all, so they simply stack in DOM
+                    order and this renders above the guide with no extra
+                    CSS. At desktop width "order" pushes it back to the right. */}
+                <div class="column sidebar-column guide-sidebar-column">
                   <h2 class="title is-2 sidebar-spacer" aria-hidden="true">
                     &nbsp;
                   </h2>
-                  {this.sidebar.map((entry) => renderSidebarEntry(entry))}
+                  {this.sidebar.map((entry, i) => (
+                    <div class={{ 'sidebar-guide-item': true, 'is-expanded': this.expandedSidebar[i] }}>
+                      <button
+                        type="button"
+                        class="sidebar-guide-toggle"
+                        aria-expanded={this.expandedSidebar[i] ? 'true' : 'false'}
+                        onClick={() => this.toggleSidebarEntry(i)}
+                      >
+                        <span>{sidebarEntryLabel(entry)}</span>
+                        <span class="sidebar-guide-chevron" aria-hidden="true">
+                          &#9662;
+                        </span>
+                      </button>
+                      <div class="sidebar-guide-body">{renderSidebarEntry(entry)}</div>
+                    </div>
+                  ))}
+                </div>
+                <div class="column is-two-thirds">
+                  <article>{this.renderArticleBody()}</article>
                 </div>
               </div>
             )}
