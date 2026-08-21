@@ -89,9 +89,8 @@ export class SkillPointsCard {
         <ul class="skill-points-list">
           {activeSkills.map((skill) => (
             <li class="skill-points-row">
-              <span class="skill-points-name">{skill.name}</span>
-              <span class="skill-points-right">
-                <span class="skill-points-value">{skill.points}</span>
+              <span class="skill-points-name-group">
+                <span class="skill-points-name">{skill.name}</span>
                 {SKILL_WIKI_URLS[skill.name] && (
                   <a
                     class="skill-points-wiki-link"
@@ -99,11 +98,10 @@ export class SkillPointsCard {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${skill.name} on the Outlands wiki`}
-                  >
-                    &#8599;
-                  </a>
+                  ></a>
                 )}
               </span>
+              <span class="skill-points-value">{skill.points}</span>
             </li>
           ))}
         </ul>
