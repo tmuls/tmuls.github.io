@@ -1,0 +1,19 @@
+[
+  {
+    "component": "skill-points",
+    "props": {
+      "title": "Skill Points",
+      "skills": [
+        { "name": "Chivalry", "points": 120 },
+        { "name": "Tactics", "points": 100 },
+        { "name": "Wrestling", "points": 95 },
+        { "name": "Alchemy", "points": 80 },
+        { "name": "Anatomy", "points": 80 },
+        { "name": "Arms Lore", "points": 80 },
+        { "name": "Healing", "points": 80 },
+        { "name": "Focus", "points": 50 },
+        { "name": "Magic Resist", "points": 35 }
+      ]
+    }
+  }
+]
