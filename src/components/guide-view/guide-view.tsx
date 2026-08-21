@@ -16,6 +16,7 @@ function renderSidebarEntry(entry: SidebarEntry, guideId: string) {
           cardTitle={props.title}
           guideId={guideId}
           skills={props.skills}
+          links={props.links}
           tabs={props.tabs}
         ></skill-points-card>
       );

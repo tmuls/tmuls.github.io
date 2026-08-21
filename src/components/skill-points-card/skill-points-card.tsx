@@ -6,10 +6,17 @@ interface SkillEntry {
   points: number;
 }
 
+interface MasteryLink {
+  color: 'gold' | 'silver' | 'bronze';
+  name: string;
+  note?: string;
+}
+
 interface SkillTab {
   label: string;
   skills: SkillEntry[];
   markdown?: string;
+  links?: MasteryLink[];
 }
 
 const SKILL_CAP = 720;
@@ -32,6 +39,18 @@ const SKILL_WIKI_URLS: Record<string, string> = {
   Wrestling: 'https://wiki.uooutlands.com/Wrestling',
 };
 
+// A single chain link, drawn as our own simple shape rather than the
+// wiki's own art - color (gold/silver/bronze) is set by the caller via
+// currentColor so it can share the same hover/theme handling as everything
+// else in the card.
+function linkIcon() {
+  return (
+    <svg class="skill-points-link-icon" viewBox="0 0 20 12" aria-hidden="true">
+      <rect x="1.25" y="1.25" width="17.5" height="9.5" rx="4.75" fill="none" stroke="currentColor" stroke-width="2" />
+    </svg>
+  );
+}
+
 @Component({
   tag: 'skill-points-card',
   styleUrl: 'skill-points-card.css',
@@ -40,6 +59,7 @@ export class SkillPointsCard {
   @Prop() cardTitle = 'Skill Points';
   @Prop() guideId?: string;
   @Prop() skills: SkillEntry[] = [];
+  @Prop() links: MasteryLink[] = [];
   @Prop() tabs: SkillTab[] = [];
   @State() activeTab = 0;
   @State() tabMarkdown: string[] = [];
@@ -66,6 +86,7 @@ export class SkillPointsCard {
     const hasTabs = this.tabs.length > 0;
     const activeSkills = hasTabs ? this.tabs[this.activeTab].skills : this.skills;
     const activeMarkdown = hasTabs ? this.tabMarkdown[this.activeTab] : '';
+    const activeLinks = hasTabs ? this.tabs[this.activeTab].links || [] : this.links;
     const total = activeSkills.reduce((sum, skill) => sum + skill.points, 0);
 
     return (
@@ -117,6 +138,23 @@ export class SkillPointsCard {
         </p>
 
         {activeMarkdown && <div class="skill-points-markdown content" innerHTML={activeMarkdown}></div>}
+
+        {activeLinks.length > 0 && (
+          <div class="skill-points-links">
+            <p class="skill-points-section-label">Link Priority</p>
+            <ul class="skill-points-links-list">
+              {activeLinks.map((link) => (
+                <li class={`skill-points-link-row skill-points-link-row--${link.color}`}>
+                  {linkIcon()}
+                  <span class="skill-points-link-text">
+                    <span class="skill-points-link-name">{link.name}</span>
+                    {link.note && <span class="skill-points-link-note"> — {link.note}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   }

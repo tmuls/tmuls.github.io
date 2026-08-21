@@ -39,6 +39,10 @@ export namespace Components {
         /**
           * @default []
          */
+        "links": MasteryLink[];
+        /**
+          * @default []
+         */
         "skills": SkillEntry[];
         /**
           * @default []
@@ -146,6 +150,10 @@ declare namespace LocalJSX {
          */
         "cardTitle"?: string;
         "guideId"?: string;
+        /**
+          * @default []
+         */
+        "links"?: MasteryLink[];
         /**
           * @default []
          */

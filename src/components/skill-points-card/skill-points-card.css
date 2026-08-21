@@ -123,3 +123,63 @@
   line-height: 1.5;
   text-align: left;
 }
+
+.skill-points-links {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #2a2d33;
+}
+
+.skill-points-section-label {
+  margin: 0 0 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a8d94;
+  text-align: left;
+}
+
+.skill-points-links-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skill-points-link-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.skill-points-link-icon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 0.6rem;
+  transform: translateY(0.1rem);
+}
+
+.skill-points-link-row--gold .skill-points-link-icon {
+  color: #c9a45c;
+}
+
+.skill-points-link-row--silver .skill-points-link-icon {
+  color: #c0c4cc;
+}
+
+.skill-points-link-row--bronze .skill-points-link-icon {
+  color: #b8763e;
+}
+
+.skill-points-link-name {
+  color: #c7c9ce;
+  font-size: 0.75rem;
+}
+
+.skill-points-link-note {
+  color: #6d7079;
+  font-size: 0.75rem;
+}
