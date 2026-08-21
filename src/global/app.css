@@ -28,6 +28,9 @@ body {
 }
 
 .site-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-weight: 700;
   font-size: 1.4rem;
   letter-spacing: 0.02em;
@@ -36,4 +39,12 @@ body {
 
 .site-title:hover {
   color: #ffffff !important;
+}
+
+.site-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
 }

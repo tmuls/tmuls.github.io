@@ -76,7 +76,8 @@ export class AppNav {
         <nav class="navbar is-transparent site-navbar" role="navigation" aria-label="main navigation">
           <div class="navbar-brand">
             <a class="navbar-item site-title" href="/">
-              tmuls
+              <img class="site-avatar" src="/assets/avatar.svg" alt="" width="28" height="28" />
+              Muls
             </a>
           </div>
           <button
