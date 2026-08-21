@@ -65,3 +65,16 @@ body {
     margin-top: 1rem;
   }
 }
+
+/* An invisible heading matching the main column's title, so a sidebar
+   card's top edge lines up with the content below that title instead of
+   with the title itself. Not needed once columns stack on mobile. */
+.sidebar-spacer {
+  visibility: hidden;
+}
+
+@media (max-width: 768px) {
+  .sidebar-spacer {
+    display: none;
+  }
+}
