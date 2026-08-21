@@ -23,7 +23,7 @@ export class AppNav {
   private sections: NavSection[] = [
     {
       label: 'Projects',
-      children: [{ label: 'Ultima Online Outlands', url: '/uo-outlands/' }],
+      children: [{ label: 'Ultima Online Outlands', url: '/uo/' }],
     },
   ];
 

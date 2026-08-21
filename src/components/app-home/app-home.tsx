@@ -17,7 +17,7 @@ export class AppHome {
     {
       name: 'Ultima Online Outlands',
       description: 'Guides and scripts for Ultima Online Outlands',
-      url: '/uo-outlands/',
+      url: '/uo/',
       image: '/assets/projects/uo-outlands.svg?v=2',
     },
     {
