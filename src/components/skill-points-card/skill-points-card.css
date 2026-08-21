@@ -80,9 +80,9 @@
 }
 
 /* The standard "external link" glyph (a page outline with an arrow
-   escaping its corner) rather than a bare chevron, so what it does reads
-   at a glance - mirrored to point up-left instead of the usual up-right.
-   Colored via currentColor so the gray-to-gold hover is one transition. */
+   escaping its corner, pointing up-right) rather than a bare chevron, so
+   what it does reads at a glance. Colored via currentColor so the
+   gray-to-gold hover is one transition. */
 .skill-points-wiki-link {
   display: inline-flex;
   align-items: center;
@@ -98,7 +98,6 @@
 .skill-points-wiki-link svg {
   width: 100%;
   height: 100%;
-  transform: scaleX(-1);
 }
 
 .skill-points-wiki-link:hover {
