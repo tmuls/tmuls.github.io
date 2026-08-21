@@ -106,7 +106,7 @@ export class GuideView {
 
                 {this.videoIds.length > 0 && (
                   <div class="guide-video-section">
-                    <h2 class="title is-4 has-text-light">YouTube Demo</h2>
+                    <h2 class="title is-4 has-text-light">{this.videoIds.length > 1 ? 'Demos' : 'YouTube Demo'}</h2>
                     {this.videoIds.map((videoId) => (
                       <div class="guide-video-embed">
                         <iframe
