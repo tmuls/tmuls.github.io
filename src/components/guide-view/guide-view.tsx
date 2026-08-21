@@ -88,10 +88,15 @@ export class GuideView {
   @State() backUrl = '/';
   @State() sidebar: SidebarEntry[] = [];
   @State() expandedSidebar: boolean[] = [];
+  @State() playingVideos: string[] = [];
   @State() status: 'loading' | 'ready' | 'error' = 'loading';
 
   private toggleSidebarEntry(index: number) {
     this.expandedSidebar = this.expandedSidebar.map((expanded, i) => (i === index ? !expanded : expanded));
+  }
+
+  private playVideo(videoId: string) {
+    this.playingVideos = [...this.playingVideos, videoId];
   }
 
   async componentWillLoad() {
@@ -155,15 +160,28 @@ export class GuideView {
         {this.videoIds.length > 0 && (
           <div class="guide-video-section">
             <h2 class="title is-4 has-text-light">{this.videoIds.length > 1 ? 'Demos' : 'YouTube Demo'}</h2>
-            {this.videoIds.map((videoId) => (
-              <div class="guide-video-embed">
-                <iframe
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                ></iframe>
-              </div>
-            ))}
+            {this.videoIds.map((videoId) =>
+              this.playingVideos.includes(videoId) ? (
+                <div class="guide-video-embed">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  ></iframe>
+                </div>
+              ) : (
+                <div class="guide-video-embed">
+                  <button
+                    type="button"
+                    class="guide-video-facade"
+                    aria-label="Play video"
+                    onClick={() => this.playVideo(videoId)}
+                  >
+                    <span class="guide-video-play-icon" aria-hidden="true"></span>
+                  </button>
+                </div>
+              ),
+            )}
           </div>
         )}
       </Fragment>

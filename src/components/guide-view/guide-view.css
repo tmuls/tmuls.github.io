@@ -51,6 +51,48 @@
   border: 0;
 }
 
+/* Nothing is fetched from YouTube until this is clicked — a live embed
+   loads its full player (and the ad/analytics traffic that comes with it)
+   the moment it's on the page, even unplayed. */
+.guide-video-facade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-video-play-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid #c9a45c;
+  background-color: rgba(20, 22, 26, 0.75);
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+
+.guide-video-facade:hover .guide-video-play-icon {
+  background-color: rgba(201, 164, 92, 0.2);
+}
+
+.guide-video-play-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 11px 0 11px 18px;
+  border-color: transparent transparent transparent #c9a45c;
+}
+
 /* Desktop: sidebar entries render as plain, always-open cards — no
    collapsible chrome. */
 .sidebar-guide-toggle {
