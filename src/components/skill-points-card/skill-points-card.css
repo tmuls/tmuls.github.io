@@ -79,31 +79,30 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A small up-right arrow drawn with two borders rather than a unicode
-   glyph, so it's crisp at this size and its color can transition smoothly
-   between the deemphasized gray and the site's gold accent on hover. */
+/* The standard "external link" glyph (a page outline with an arrow
+   escaping its corner) rather than a bare chevron, so what it does reads
+   at a glance - mirrored to point up-left instead of the usual up-right.
+   Colored via currentColor so the gray-to-gold hover is one transition. */
 .skill-points-wiki-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  margin-left: 0.1rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-left: 0.3rem;
+  color: #5a5d64;
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
-.skill-points-wiki-link::after {
-  content: '';
-  width: 5px;
-  height: 5px;
-  border-top: 1.5px solid #5a5d64;
-  border-right: 1.5px solid #5a5d64;
-  transform: translate(-1px, 1px) rotate(45deg);
-  transition: border-color 0.15s ease;
+.skill-points-wiki-link svg {
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
 }
 
-.skill-points-wiki-link:hover::after {
-  border-color: #c9a45c;
+.skill-points-wiki-link:hover {
+  color: #c9a45c;
 }
 
 .skill-points-total {
