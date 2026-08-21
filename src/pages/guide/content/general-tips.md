@@ -1,6 +1,6 @@
 ---
 id: general-tips
-title: General Tips
+title: Dexxer General Tips
 project: uo
 ---
 ### Most important skills / stats
