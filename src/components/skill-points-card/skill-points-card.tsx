@@ -39,17 +39,14 @@ const SKILL_WIKI_URLS: Record<string, string> = {
   Wrestling: 'https://wiki.uooutlands.com/Wrestling',
 };
 
-// A single chain link, drawn as our own simple shape rather than the
-// wiki's own art - color (gold/silver/bronze) is set by the caller via
-// currentColor so it can share the same hover/theme handling as everything
-// else in the card.
-function linkIcon() {
-  return (
-    <svg class="skill-points-link-icon" viewBox="0 0 20 12" aria-hidden="true">
-      <rect x="1.25" y="1.25" width="17.5" height="9.5" rx="4.75" fill="none" stroke="currentColor" stroke-width="2" />
-    </svg>
-  );
-}
+// The actual in-game mastery chain link icons, cropped from the wiki's own
+// "How Do I Get Mastery Chain Links?" reference image and keyed to a
+// transparent background, rather than a redrawn approximation.
+const LINK_ICONS: Record<MasteryLink['color'], string> = {
+  bronze: '/assets/mastery-links/bronze.png',
+  silver: '/assets/mastery-links/silver.png',
+  gold: '/assets/mastery-links/gold.png',
+};
 
 @Component({
   tag: 'skill-points-card',
@@ -144,8 +141,8 @@ export class SkillPointsCard {
             <p class="skill-points-section-label">Link Priority</p>
             <ul class="skill-points-links-list">
               {activeLinks.map((link) => (
-                <li class={`skill-points-link-row skill-points-link-row--${link.color}`}>
-                  {linkIcon()}
+                <li class="skill-points-link-row">
+                  <img class="skill-points-link-icon" src={LINK_ICONS[link.color]} alt="" />
                   <span class="skill-points-link-text">
                     <span class="skill-points-link-name">{link.name}</span>
                     {link.note && <span class="skill-points-link-note"> — {link.note}</span>}

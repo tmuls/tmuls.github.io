@@ -157,21 +157,10 @@
 
 .skill-points-link-icon {
   flex-shrink: 0;
-  width: 1rem;
-  height: 0.6rem;
-  transform: translateY(0.1rem);
-}
-
-.skill-points-link-row--gold .skill-points-link-icon {
-  color: #c9a45c;
-}
-
-.skill-points-link-row--silver .skill-points-link-icon {
-  color: #c0c4cc;
-}
-
-.skill-points-link-row--bronze .skill-points-link-icon {
-  color: #b8763e;
+  width: 1.1rem;
+  height: 1.1rem;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .skill-points-link-name {
