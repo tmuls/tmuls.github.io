@@ -35,10 +35,15 @@ export namespace Components {
           * @default 'Skill Points'
          */
         "cardTitle": string;
+        "guideId"?: string;
         /**
           * @default []
          */
         "skills": SkillEntry[];
+        /**
+          * @default []
+         */
+        "tabs": SkillTab[];
     }
 }
 declare global {
@@ -140,10 +145,15 @@ declare namespace LocalJSX {
           * @default 'Skill Points'
          */
         "cardTitle"?: string;
+        "guideId"?: string;
         /**
           * @default []
          */
         "skills"?: SkillEntry[];
+        /**
+          * @default []
+         */
+        "tabs"?: SkillTab[];
     }
 
     interface GuideListAttributes {
@@ -159,6 +169,7 @@ declare namespace LocalJSX {
     }
     interface SkillPointsCardAttributes {
         "cardTitle": string;
+        "guideId": string;
     }
 
     interface IntrinsicElements {

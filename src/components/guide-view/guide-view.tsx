@@ -7,11 +7,18 @@ interface SidebarEntry {
   props?: Record<string, any>;
 }
 
-function renderSidebarEntry(entry: SidebarEntry) {
+function renderSidebarEntry(entry: SidebarEntry, guideId: string) {
   const props = entry.props || {};
   switch (entry.component) {
     case 'skill-points':
-      return <skill-points-card cardTitle={props.title} skills={props.skills}></skill-points-card>;
+      return (
+        <skill-points-card
+          cardTitle={props.title}
+          guideId={guideId}
+          skills={props.skills}
+          tabs={props.tabs}
+        ></skill-points-card>
+      );
     default:
       return null;
   }
@@ -180,7 +187,7 @@ export class GuideView {
                   &#9662;
                 </span>
               </button>
-              <div class="sidebar-guide-body">{renderSidebarEntry(entry)}</div>
+              <div class="sidebar-guide-body">{renderSidebarEntry(entry, this.guideId)}</div>
             </div>
           ))}
         </div>
