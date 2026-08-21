@@ -12,6 +12,9 @@ export namespace Components {
     }
     interface AppNav {
     }
+    interface GuideList {
+        "guideId": string;
+    }
     interface GuideView {
     }
     interface LatestRelease {
@@ -54,6 +57,12 @@ declare global {
         prototype: HTMLAppNavElement;
         new (): HTMLAppNavElement;
     };
+    interface HTMLGuideListElement extends Components.GuideList, HTMLStencilElement {
+    }
+    var HTMLGuideListElement: {
+        prototype: HTMLGuideListElement;
+        new (): HTMLGuideListElement;
+    };
     interface HTMLGuideViewElement extends Components.GuideView, HTMLStencilElement {
     }
     var HTMLGuideViewElement: {
@@ -82,6 +91,7 @@ declare global {
         "app-home": HTMLAppHomeElement;
         "app-layout": HTMLAppLayoutElement;
         "app-nav": HTMLAppNavElement;
+        "guide-list": HTMLGuideListElement;
         "guide-view": HTMLGuideViewElement;
         "latest-release": HTMLLatestReleaseElement;
         "project-page": HTMLProjectPageElement;
@@ -89,11 +99,16 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    type OneOf<K extends string, PropT, AttrT = PropT> = { [P in K]: PropT } & { [P in `attr:${K}`]?: never } | { [P in `attr:${K}`]: AttrT } & { [P in K]?: never };
+
     interface AppHome {
     }
     interface AppLayout {
     }
     interface AppNav {
+    }
+    interface GuideList {
+        "guideId": string;
     }
     interface GuideView {
     }
@@ -118,6 +133,9 @@ declare namespace LocalJSX {
         "skills"?: SkillEntry[];
     }
 
+    interface GuideListAttributes {
+        "guideId": string;
+    }
     interface ProjectPageAttributes {
         "pageTitle": string;
         "tagline": string;
@@ -131,6 +149,7 @@ declare namespace LocalJSX {
         "app-home": AppHome;
         "app-layout": AppLayout;
         "app-nav": AppNav;
+        "guide-list": Omit<GuideList, keyof GuideListAttributes> & { [K in keyof GuideList & keyof GuideListAttributes]?: GuideList[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `attr:${K}`]?: GuideListAttributes[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `prop:${K}`]?: GuideList[K] } & OneOf<"guideId", GuideList["guideId"], GuideListAttributes["guideId"]>;
         "guide-view": GuideView;
         "latest-release": LatestRelease;
         "project-page": Omit<ProjectPage, keyof ProjectPageAttributes> & { [K in keyof ProjectPage & keyof ProjectPageAttributes]?: ProjectPage[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `attr:${K}`]?: ProjectPageAttributes[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `prop:${K}`]?: ProjectPage[K] };
@@ -144,6 +163,7 @@ declare module "@stencil/core" {
             "app-home": LocalJSX.IntrinsicElements["app-home"] & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-layout": LocalJSX.IntrinsicElements["app-layout"] & JSXBase.HTMLAttributes<HTMLAppLayoutElement>;
             "app-nav": LocalJSX.IntrinsicElements["app-nav"] & JSXBase.HTMLAttributes<HTMLAppNavElement>;
+            "guide-list": LocalJSX.IntrinsicElements["guide-list"] & JSXBase.HTMLAttributes<HTMLGuideListElement>;
             "guide-view": LocalJSX.IntrinsicElements["guide-view"] & JSXBase.HTMLAttributes<HTMLGuideViewElement>;
             "latest-release": LocalJSX.IntrinsicElements["latest-release"] & JSXBase.HTMLAttributes<HTMLLatestReleaseElement>;
             "project-page": LocalJSX.IntrinsicElements["project-page"] & JSXBase.HTMLAttributes<HTMLProjectPageElement>;

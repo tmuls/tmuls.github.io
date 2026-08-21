@@ -1,7 +1,3 @@
----
-title: Wrestler
-project: uo
----
 ## Air Template
 **Stance** Dragon
 **Ability** Haymaker

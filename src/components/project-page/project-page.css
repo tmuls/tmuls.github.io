@@ -57,28 +57,20 @@
   margin-bottom: 0;
 }
 
-.script-list,
-.guide-list {
+.script-list {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.script-entry,
-.guide-entry {
+.script-entry {
   padding: 1.25rem 1.5rem;
   background-color: #14161a;
   border: 1px solid #2a2d33;
   border-radius: 16px;
 }
 
-.guide-excerpt {
-  margin-top: 0.35rem;
-  line-height: 1.5;
-}
-
-.script-link,
-.guide-read-more {
+.script-link {
   display: inline-block;
   margin-top: 0.75rem;
   color: #c9a45c;
@@ -86,8 +78,7 @@
   text-decoration: none;
 }
 
-.script-link:hover,
-.guide-read-more:hover {
+.script-link:hover {
   color: #e0c07c;
 }
 

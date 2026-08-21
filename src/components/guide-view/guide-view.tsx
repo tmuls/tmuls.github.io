@@ -1,5 +1,6 @@
 import { Component, State, Fragment, h } from '@stencil/core';
 import { marked } from 'marked';
+import { parseFrontmatter, humanizeId } from '../../utils/guide-content';
 
 interface SidebarEntry {
   component: string;
@@ -20,21 +21,14 @@ function renderSidebarEntry(entry: SidebarEntry) {
   }
 }
 
-function parseFrontmatter(raw: string): { data: Record<string, string>; body: string } {
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  if (!match) {
-    return { data: {}, body: raw };
+function backUrlFor(id: string): string {
+  const segments = id.split('/');
+  segments.pop();
+  const parentId = segments.join('/');
+  if (PROJECT_HOME[parentId]) {
+    return PROJECT_HOME[parentId];
   }
-  const [, frontmatter, body] = match;
-  const data: Record<string, string> = {};
-  for (const line of frontmatter.split(/\r?\n/)) {
-    const idx = line.indexOf(':');
-    if (idx === -1) continue;
-    const key = line.slice(0, idx).trim();
-    const value = line.slice(idx + 1).trim();
-    data[key] = value;
-  }
-  return { data, body: body.replace(/^\r?\n+/, '') };
+  return parentId ? `/guide/?id=${parentId}` : '/';
 }
 
 const YOUTUBE_RE = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/g;
@@ -63,11 +57,26 @@ function markExternalLinks(html: string): string {
   return wrapper.innerHTML;
 }
 
+async function loadTitle(id: string, lastSegment: string): Promise<string> {
+  try {
+    const res = await fetch(`/assets/guides/${id}/${lastSegment}_blurb.md`, { cache: 'no-cache' });
+    if (res.ok) {
+      const { data } = parseFrontmatter(await res.text());
+      if (data.title) return data.title;
+    }
+  } catch (e) {
+    // fall through to the humanized id
+  }
+  return humanizeId(lastSegment);
+}
+
 @Component({
   tag: 'guide-view',
   styleUrl: 'guide-view.css',
 })
 export class GuideView {
+  @State() id = '';
+  @State() mode: 'branch' | 'leaf' = 'leaf';
   @State() title = '';
   @State() html = '';
   @State() videoIds: string[] = [];
@@ -82,28 +91,41 @@ export class GuideView {
       return;
     }
 
+    this.id = id;
+    this.backUrl = backUrlFor(id);
+    const lastSegment = id.split('/').pop() as string;
+
     try {
-      const mdRes = await fetch(`/assets/guides/${id}/${id}_guide.md`, { cache: 'no-cache' });
-      if (!mdRes.ok) {
-        throw new Error('Guide not found');
+      // A folder (branch) has an index.json listing its children; a guide
+      // (leaf) doesn't. Probing for it is how this component decides what
+      // the id actually refers to and what to render.
+      const indexRes = await fetch(`/assets/guides/${id}/index.json`, { cache: 'no-cache' });
+
+      if (indexRes.ok) {
+        this.mode = 'branch';
+        this.title = await loadTitle(id, lastSegment);
+        this.status = 'ready';
+      } else {
+        const mdRes = await fetch(`/assets/guides/${id}/${lastSegment}_guide.md`, { cache: 'no-cache' });
+        if (!mdRes.ok) {
+          throw new Error('Guide not found');
+        }
+
+        this.mode = 'leaf';
+        const raw = await mdRes.text();
+        this.videoIds = extractYoutubeIds(raw);
+        this.html = markExternalLinks(marked.parse(raw) as string);
+        this.title = await loadTitle(id, lastSegment);
+
+        try {
+          const sidebarRes = await fetch(`/assets/guides/${id}/${lastSegment}_sidebar.json`, { cache: 'no-cache' });
+          this.sidebar = sidebarRes.ok ? await sidebarRes.json() : [];
+        } catch (e) {
+          this.sidebar = [];
+        }
+
+        this.status = 'ready';
       }
-
-      const raw = await mdRes.text();
-      const { data, body } = parseFrontmatter(raw);
-
-      this.title = data.title || id;
-      this.backUrl = data.project && PROJECT_HOME[data.project] ? PROJECT_HOME[data.project] : '/';
-      this.videoIds = extractYoutubeIds(body);
-      this.html = markExternalLinks(marked.parse(body) as string);
-
-      try {
-        const sidebarRes = await fetch(`/assets/guides/${id}/${id}_sidebar.json`, { cache: 'no-cache' });
-        this.sidebar = sidebarRes.ok ? await sidebarRes.json() : [];
-      } catch (e) {
-        this.sidebar = [];
-      }
-
-      this.status = 'ready';
 
       if (typeof document !== 'undefined') {
         document.title = this.title;
@@ -151,11 +173,18 @@ export class GuideView {
             {this.status === 'loading' && <p class="has-text-grey-light">Loading&hellip;</p>}
             {this.status === 'error' && <p class="has-text-grey-light">Guide not found.</p>}
 
-            {this.status === 'ready' && this.sidebar.length === 0 && (
+            {this.status === 'ready' && this.mode === 'branch' && (
+              <div>
+                <h1 class="title is-2 has-text-light">{this.title}</h1>
+                <guide-list guideId={this.id}></guide-list>
+              </div>
+            )}
+
+            {this.status === 'ready' && this.mode === 'leaf' && this.sidebar.length === 0 && (
               <article>{this.renderArticleBody()}</article>
             )}
 
-            {this.status === 'ready' && this.sidebar.length > 0 && (
+            {this.status === 'ready' && this.mode === 'leaf' && this.sidebar.length > 0 && (
               <div class="columns">
                 <div class="column is-two-thirds">
                   <article>{this.renderArticleBody()}</article>

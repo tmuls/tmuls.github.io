@@ -1,7 +1,3 @@
----
-title: Dexxer General Tips
-project: uo
----
 ### Most important skills / stats
 * **Arms lore** is the most important dexxer skill for almost every build.  It gives you attack speed, increases special chance, increases recharge of weapon abilities, and allows you to disarm every 30 seconds for a huge damage bonus (25% at 120 skill.)  Keep this at 80 at all costs, higher if possible.
 * **Alchemy** is generally considered to be better than parry.  Take the defensive abilities, use the defensive calculator.  It is VERY easy to hit the defense cap of 75% with Alchemy and Healer codex alone.
