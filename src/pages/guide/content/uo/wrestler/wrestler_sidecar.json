@@ -21,15 +21,15 @@
         {
           "label": "Low Aspect",
           "skills": [
-            { "name": "Chivalry", "points": 120 },
+            { "name": "Arms Lore", "points": 120 },
             { "name": "Tactics", "points": 100 },
-            { "name": "Wrestling", "points": 95 },
-            { "name": "Camping", "points": 80 },
+            { "name": "Wrestling", "points": 100 },
+            { "name": "Alchemy", "points": 80 },
             { "name": "Anatomy", "points": 80 },
-            { "name": "Arms Lore", "points": 80 },
+            { "name": "Camping", "points": 80 },
             { "name": "Healing", "points": 80 },
-            { "name": "Focus", "points": 50 },
-            { "name": "Magic Resist", "points": 35 }
+            { "name": "Focus", "points": 67 },
+            { "name": "Magic Resist", "points": 13 }
           ],
           "markdown": "wrestler_low_aspect.md"
         }
