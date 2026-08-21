@@ -57,6 +57,31 @@
   margin-bottom: 0;
 }
 
+.script-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.script-entry {
+  padding: 1.25rem 1.5rem;
+  background-color: #14161a;
+  border: 1px solid #2a2d33;
+  border-radius: 16px;
+}
+
+.script-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #c9a45c;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.script-link:hover {
+  color: #e0c07c;
+}
+
 @media (max-width: 600px) {
   .project-hero {
     min-height: 200px;
