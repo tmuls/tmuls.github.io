@@ -48,3 +48,20 @@ body {
   display: block;
   flex-shrink: 0;
 }
+
+/* Shared two-column content layout: main content + a right-hand sidebar
+   that flows underneath on mobile (Bulma's default column stacking). */
+.columns > .column {
+  min-width: 0;
+}
+
+.sidebar-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .sidebar-column {
+    margin-top: 1rem;
+  }
+}

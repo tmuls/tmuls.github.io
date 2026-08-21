@@ -61,15 +61,8 @@ export class AppHome {
       <app-layout>
         <section class="section">
           <div class="container">
-            <div class="columns">
-              <div class="column is-two-thirds">
-                <h2 class="title is-4 has-text-light">Projects</h2>
-                <div class="columns is-multiline">{this.projects.map((project) => this.renderCard(project))}</div>
-              </div>
-              <div class="column sidebar-column">
-                <latest-release></latest-release>
-              </div>
-            </div>
+            <h2 class="title is-4 has-text-light">Projects</h2>
+            <div class="columns is-multiline">{this.projects.map((project) => this.renderCard(project))}</div>
           </div>
         </section>
       </app-layout>
