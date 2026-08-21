@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
   <meta name="description" content="Ultima Online Outlands project page">
   <link rel="stylesheet" href="/build/app.css">
+  <script type="module" src="/build/app.esm.js"></script>
+  <script nomodule src="/build/app.js"></script>
   <style>
     .hero-banner {
       height: 240px;
@@ -20,11 +22,7 @@
   </style>
 </head>
 <body>
-  <nav class="navbar is-transparent site-navbar" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-      <a class="navbar-item site-title" href="/">tmuls</a>
-    </div>
-  </nav>
+  <app-nav></app-nav>
 
   <section class="section">
     <div class="container">

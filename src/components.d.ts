@@ -8,6 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface AppHome {
     }
+    interface AppNav {
+    }
 }
 declare global {
     interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
@@ -16,15 +18,25 @@ declare global {
         prototype: HTMLAppHomeElement;
         new (): HTMLAppHomeElement;
     };
+    interface HTMLAppNavElement extends Components.AppNav, HTMLStencilElement {
+    }
+    var HTMLAppNavElement: {
+        prototype: HTMLAppNavElement;
+        new (): HTMLAppNavElement;
+    };
     interface HTMLElementTagNameMap {
         "app-home": HTMLAppHomeElement;
+        "app-nav": HTMLAppNavElement;
     }
 }
 declare namespace LocalJSX {
     interface AppHome {
     }
+    interface AppNav {
+    }
     interface IntrinsicElements {
         "app-home": AppHome;
+        "app-nav": AppNav;
     }
 }
 export { LocalJSX as JSX };
@@ -32,6 +44,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "app-home": LocalJSX.IntrinsicElements["app-home"] & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
+            "app-nav": LocalJSX.IntrinsicElements["app-nav"] & JSXBase.HTMLAttributes<HTMLAppNavElement>;
         }
     }
 }

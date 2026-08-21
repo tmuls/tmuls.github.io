@@ -24,13 +24,7 @@ export class AppHome {
   render() {
     return (
       <Host>
-        <nav class="navbar is-transparent site-navbar" role="navigation" aria-label="main navigation">
-          <div class="navbar-brand">
-            <a class="navbar-item site-title" href="/">
-              tmuls
-            </a>
-          </div>
-        </nav>
+        <app-nav></app-nav>
 
         <section class="section">
           <div class="container">
