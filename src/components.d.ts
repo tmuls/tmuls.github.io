@@ -12,6 +12,14 @@ export namespace Components {
     }
     interface AppNav {
     }
+    interface ProjectPage {
+        "heroImage"?: string;
+        /**
+          * @default ''
+         */
+        "pageTitle": string;
+        "tagline"?: string;
+    }
 }
 declare global {
     interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
@@ -32,10 +40,17 @@ declare global {
         prototype: HTMLAppNavElement;
         new (): HTMLAppNavElement;
     };
+    interface HTMLProjectPageElement extends Components.ProjectPage, HTMLStencilElement {
+    }
+    var HTMLProjectPageElement: {
+        prototype: HTMLProjectPageElement;
+        new (): HTMLProjectPageElement;
+    };
     interface HTMLElementTagNameMap {
         "app-home": HTMLAppHomeElement;
         "app-layout": HTMLAppLayoutElement;
         "app-nav": HTMLAppNavElement;
+        "project-page": HTMLProjectPageElement;
     }
 }
 declare namespace LocalJSX {
@@ -45,10 +60,26 @@ declare namespace LocalJSX {
     }
     interface AppNav {
     }
+    interface ProjectPage {
+        "heroImage"?: string;
+        /**
+          * @default ''
+         */
+        "pageTitle"?: string;
+        "tagline"?: string;
+    }
+
+    interface ProjectPageAttributes {
+        "pageTitle": string;
+        "tagline": string;
+        "heroImage": string;
+    }
+
     interface IntrinsicElements {
         "app-home": AppHome;
         "app-layout": AppLayout;
         "app-nav": AppNav;
+        "project-page": Omit<ProjectPage, keyof ProjectPageAttributes> & { [K in keyof ProjectPage & keyof ProjectPageAttributes]?: ProjectPage[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `attr:${K}`]?: ProjectPageAttributes[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `prop:${K}`]?: ProjectPage[K] };
     }
 }
 export { LocalJSX as JSX };
@@ -58,6 +89,7 @@ declare module "@stencil/core" {
             "app-home": LocalJSX.IntrinsicElements["app-home"] & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-layout": LocalJSX.IntrinsicElements["app-layout"] & JSXBase.HTMLAttributes<HTMLAppLayoutElement>;
             "app-nav": LocalJSX.IntrinsicElements["app-nav"] & JSXBase.HTMLAttributes<HTMLAppNavElement>;
+            "project-page": LocalJSX.IntrinsicElements["project-page"] & JSXBase.HTMLAttributes<HTMLProjectPageElement>;
         }
     }
 }

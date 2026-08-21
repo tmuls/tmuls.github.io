@@ -8,41 +8,22 @@
   <link rel="stylesheet" href="/build/app.css">
   <script type="module" src="/build/app.esm.js"></script>
   <script nomodule src="/build/app.js"></script>
-  <style>
-    .hero-banner {
-      height: 240px;
-      border-radius: 6px;
-      background-image:
-        linear-gradient(to bottom, transparent 45%, #17191d 100%),
-        url('/assets/projects/uo-outlands.svg?v=2');
-      background-size: cover;
-      background-position: center;
-      margin-bottom: 1.5rem;
-    }
-  </style>
 </head>
 <body>
-  <app-layout>
-    <section class="section">
-      <div class="container">
-        <p class="mb-4">
-          <a href="/" class="has-text-grey-light">&larr; Back to projects</a>
-        </p>
+  <project-page
+    page-title="Ultima Online Outlands"
+    tagline="A player-driven, open-world Ultima Online shard."
+    hero-image="/assets/projects/uo-outlands.svg?v=2"
+  >
+    <div class="content-section">
+      <h2 class="title is-4 has-text-light">Guides</h2>
+      <p class="has-text-grey-light">Coming soon.</p>
+    </div>
 
-        <div class="hero-banner"></div>
-
-        <h1 class="title is-2 has-text-light">Ultima Online Outlands</h1>
-        <p class="subtitle is-5 has-text-grey-light">A player-driven, open-world Ultima Online shard.</p>
-
-        <div class="content has-text-grey-light">
-          <p>
-            Outlands is a free, community-run Ultima Online shard built around a harsh, unforgiving
-            open world, a deep player-driven economy, and full-loot PvP. More details, screenshots,
-            and links are coming soon.
-          </p>
-        </div>
-      </div>
-    </section>
-  </app-layout>
+    <div class="content-section">
+      <h2 class="title is-4 has-text-light">Scripts</h2>
+      <p class="has-text-grey-light">Coming soon.</p>
+    </div>
+  </project-page>
 </body>
 </html>
