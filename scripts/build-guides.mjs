@@ -62,15 +62,27 @@ for (const file of files) {
     continue;
   }
 
+  const priority = data.priority !== undefined && data.priority !== '' ? Number(data.priority) : null;
+
   index.push({
     id: data.id,
     title: data.title,
     project: data.project || null,
+    priority: Number.isFinite(priority) ? priority : null,
     excerpt: toExcerpt(body),
   });
 
   writeFileSync(join(outDir, `${data.id}.md`), body, 'utf8');
 }
+
+// Lower priority number shows first. Guides without a priority sort after
+// all prioritized guides, keeping their relative file order among themselves.
+index.sort((a, b) => {
+  if (a.priority === null && b.priority === null) return 0;
+  if (a.priority === null) return 1;
+  if (b.priority === null) return -1;
+  return a.priority - b.priority;
+});
 
 writeFileSync(join(outDir, 'index.json'), JSON.stringify(index, null, 2), 'utf8');
 console.log(`Indexed ${index.length} guide(s) into ${outDir}/index.json`);
