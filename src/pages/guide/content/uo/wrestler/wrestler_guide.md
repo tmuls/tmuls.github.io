@@ -5,12 +5,12 @@
 
 This demo shows a build that is using Tailoring.  There is no reason to use tailoring over something better unless you want to wear bone armor.  Even if you like bone armor, the utility of other skills outweighs the benefit of tailoring.
 
-https://www.youtube.com/watch?v=0jidDjdAM9c
+<!-- https://www.youtube.com/watch?v=0jidDjdAM9c -->
 
 ## Madness Template
 Coming soon.
 
-https://www.youtube.com/watch?v=z2jFxtXUWSQ
+<!-- https://www.youtube.com/watch?v=z2jFxtXUWSQ -->
 
 ## General Tips
 
