@@ -31,7 +31,7 @@ a.project-card {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-image: linear-gradient(to right, transparent 0%, var(--bulma-box-background-color) 26%);
+  background-image: linear-gradient(to right, transparent 0%, var(--bulma-box-background-color) 20%);
 }
 
 /* Layer 4 (topmost): the text. */
