@@ -1,10 +1,11 @@
-import { Component, Host, h } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 
-interface Project {
+interface CardItem {
   name: string;
   description: string;
   url: string;
   image?: string;
+  external?: boolean;
 }
 
 @Component({
@@ -12,7 +13,7 @@ interface Project {
   styleUrl: 'app-home.css',
 })
 export class AppHome {
-  private projects: Project[] = [
+  private projects: CardItem[] = [
     {
       name: 'Ultima Online Outlands',
       description: 'Guides and scripts for Ultima Online Outlands',
@@ -21,48 +22,56 @@ export class AppHome {
     },
   ];
 
+  private links: CardItem[] = [
+    {
+      name: 'YouTube',
+      description: 'Video guides and gameplay',
+      url: 'https://www.youtube.com/@e_muls',
+      image: '/assets/projects/youtube.svg',
+      external: true,
+    },
+  ];
+
+  private renderCard(item: CardItem) {
+    return (
+      <div class="column is-half">
+        <a
+          class="box project-card"
+          href={item.url}
+          target={item.external ? '_blank' : undefined}
+          rel={item.external ? 'noopener noreferrer' : undefined}
+        >
+          {item.image && (
+            <div
+              class="project-card-image"
+              style={{
+                backgroundImage: `url(${item.image})`,
+              }}
+            ></div>
+          )}
+          {item.image && <div class="project-card-fade"></div>}
+          <div class="project-card-content">
+            <p class="title is-5">{item.name}</p>
+            <p class="subtitle is-6">{item.description}</p>
+          </div>
+        </a>
+      </div>
+    );
+  }
+
   render() {
     return (
-      <Host>
-        <app-nav></app-nav>
-
+      <app-layout>
         <section class="section">
           <div class="container">
             <h2 class="title is-4 has-text-light">Projects</h2>
-            <div class="columns is-multiline">
-              {this.projects.map((project) => (
-                <div class="column is-half">
-                  <a class="box project-card" href={project.url}>
-                    {project.image && (
-                      <div
-                        class="project-card-image"
-                        style={{
-                          backgroundImage: `url(${project.image})`,
-                        }}
-                      ></div>
-                    )}
-                    {project.image && <div class="project-card-fade"></div>}
-                    <div class="project-card-content">
-                      <p class="title is-5">{project.name}</p>
-                      <p class="subtitle is-6">{project.description}</p>
-                    </div>
-                  </a>
-                </div>
-              ))}
-            </div>
+            <div class="columns is-multiline">{this.projects.map((project) => this.renderCard(project))}</div>
 
-            <a class="button youtube-button" href="https://www.youtube.com/@e_muls" target="_blank" rel="noopener noreferrer">
-              <span class="icon">
-                <svg viewBox="0 0 48 34" width="22" height="16" aria-hidden="true">
-                  <rect width="48" height="34" rx="10" fill="#ff0000"></rect>
-                  <path d="M20 10l14 7-14 7V10z" fill="#ffffff"></path>
-                </svg>
-              </span>
-              <span>YouTube</span>
-            </a>
+            <h2 class="title is-4 has-text-light mt-5">Links</h2>
+            <div class="columns is-multiline">{this.links.map((link) => this.renderCard(link))}</div>
           </div>
         </section>
-      </Host>
+      </app-layout>
     );
   }
 }
