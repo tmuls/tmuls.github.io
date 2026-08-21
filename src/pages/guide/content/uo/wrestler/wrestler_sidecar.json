@@ -16,7 +16,8 @@
             { "name": "Healing", "points": 80 },
             { "name": "Focus", "points": 50 },
             { "name": "Magic Resist", "points": 35 }
-          ]
+          ],
+          "markdown": "wrestler_high_aspect.md"
         },
         {
           "label": "Low Aspect",
