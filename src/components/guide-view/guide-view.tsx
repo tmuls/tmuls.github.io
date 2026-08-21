@@ -128,7 +128,7 @@ export class GuideView {
         this.title = await loadTitle(id, lastSegment);
 
         try {
-          const sidebarRes = await fetch(`/assets/guides/${id}/${lastSegment}_sidebar.json`, { cache: 'no-cache' });
+          const sidebarRes = await fetch(`/assets/guides/${id}/${lastSegment}_sidecar.json`, { cache: 'no-cache' });
           this.sidebar = sidebarRes.ok ? await sidebarRes.json() : [];
         } catch (e) {
           this.sidebar = [];
