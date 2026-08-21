@@ -15,7 +15,7 @@ export class AppHome {
   private projects: Project[] = [
     {
       name: 'Ultima Online Outlands',
-      description: 'Guides and scripts for UO Outlands',
+      description: 'Guides and scripts for Ultima Online Outlands',
       url: '/uo-outlands/',
       image: '/assets/projects/uo-outlands.svg?v=2',
     },
