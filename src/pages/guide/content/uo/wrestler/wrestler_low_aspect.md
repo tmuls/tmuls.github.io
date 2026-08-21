@@ -1,1 +1,1 @@
-A lot of survivability in this build comes from air aspect. If you are low air aspect then you may want to use camping instead of parrying.
+Tuned for low weapon aspect. Reduce wrestling and increase the skill of your choice if you have more than 107% accuracy with your weapon aspect on.
