@@ -17,7 +17,13 @@
             { "name": "Focus", "points": 50 },
             { "name": "Magic Resist", "points": 35 }
           ],
-          "markdown": "wrestler_high_aspect.md"
+          "markdown": "wrestler_high_aspect.md",
+          "links": [
+            { "color": "gold", "name": "Damage Dealt By Player" },
+            { "color": "gold", "name": "Melee Special Chance/Special Damage" },
+            { "color": "gold", "name": "Melee Damage/Ignore Armor Chance" },
+            { "color": "silver", "name": "Melee Accuracy", "note": "as needed to maintain 107% accuracy" }
+          ]
         },
         {
           "label": "Low Aspect",
@@ -32,7 +38,13 @@
             { "name": "Focus", "points": 67 },
             { "name": "Magic Resist", "points": 13 }
           ],
-          "markdown": "wrestler_low_aspect.md"
+          "markdown": "wrestler_low_aspect.md",
+          "links": [
+            { "color": "gold", "name": "Damage Dealt By Player" },
+            { "color": "gold", "name": "Melee Special Chance/Special Damage" },
+            { "color": "gold", "name": "Melee Damage/Ignore Armor Chance" },
+            { "color": "silver", "name": "Melee Accuracy", "note": "as needed to maintain 107% accuracy" }
+          ]
         }
       ]
     }
