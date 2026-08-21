@@ -18,3 +18,20 @@ export function parseFrontmatter(raw: string): { data: Record<string, string>; b
 export function humanizeId(id: string): string {
   return id.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
+
+// A guide folder's title comes from its own "<name>_blurb.md" frontmatter,
+// whether that folder is a leaf (a guide) or a branch (a folder shown as a
+// list) - falling back to a humanized version of the id if there's no blurb.
+export async function loadGuideTitle(guideId: string): Promise<string> {
+  const lastSegment = guideId.split('/').pop() as string;
+  try {
+    const res = await fetch(`/assets/guides/${guideId}/${lastSegment}_blurb.md`, { cache: 'no-cache' });
+    if (res.ok) {
+      const { data } = parseFrontmatter(await res.text());
+      if (data.title) return data.title;
+    }
+  } catch (e) {
+    // fall through to the humanized id
+  }
+  return humanizeId(lastSegment);
+}
