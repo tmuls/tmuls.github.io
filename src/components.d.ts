@@ -27,6 +27,16 @@ export namespace Components {
         "pageTitle": string;
         "tagline"?: string;
     }
+    interface SkillPointsCard {
+        /**
+          * @default 'Skill Points'
+         */
+        "cardTitle": string;
+        /**
+          * @default []
+         */
+        "skills": SkillEntry[];
+    }
 }
 declare global {
     interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
@@ -71,6 +81,12 @@ declare global {
         prototype: HTMLProjectPageElement;
         new (): HTMLProjectPageElement;
     };
+    interface HTMLSkillPointsCardElement extends Components.SkillPointsCard, HTMLStencilElement {
+    }
+    var HTMLSkillPointsCardElement: {
+        prototype: HTMLSkillPointsCardElement;
+        new (): HTMLSkillPointsCardElement;
+    };
     interface HTMLElementTagNameMap {
         "app-home": HTMLAppHomeElement;
         "app-layout": HTMLAppLayoutElement;
@@ -79,6 +95,7 @@ declare global {
         "guide-view": HTMLGuideViewElement;
         "latest-release": HTMLLatestReleaseElement;
         "project-page": HTMLProjectPageElement;
+        "skill-points-card": HTMLSkillPointsCardElement;
     }
 }
 declare namespace LocalJSX {
@@ -103,6 +120,16 @@ declare namespace LocalJSX {
         "pageTitle"?: string;
         "tagline"?: string;
     }
+    interface SkillPointsCard {
+        /**
+          * @default 'Skill Points'
+         */
+        "cardTitle"?: string;
+        /**
+          * @default []
+         */
+        "skills"?: SkillEntry[];
+    }
 
     interface GuideListAttributes {
         "project": string;
@@ -111,6 +138,9 @@ declare namespace LocalJSX {
         "pageTitle": string;
         "tagline": string;
         "heroImage": string;
+    }
+    interface SkillPointsCardAttributes {
+        "cardTitle": string;
     }
 
     interface IntrinsicElements {
@@ -121,6 +151,7 @@ declare namespace LocalJSX {
         "guide-view": GuideView;
         "latest-release": LatestRelease;
         "project-page": Omit<ProjectPage, keyof ProjectPageAttributes> & { [K in keyof ProjectPage & keyof ProjectPageAttributes]?: ProjectPage[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `attr:${K}`]?: ProjectPageAttributes[K] } & { [K in keyof ProjectPage & keyof ProjectPageAttributes as `prop:${K}`]?: ProjectPage[K] };
+        "skill-points-card": Omit<SkillPointsCard, keyof SkillPointsCardAttributes> & { [K in keyof SkillPointsCard & keyof SkillPointsCardAttributes]?: SkillPointsCard[K] } & { [K in keyof SkillPointsCard & keyof SkillPointsCardAttributes as `attr:${K}`]?: SkillPointsCardAttributes[K] } & { [K in keyof SkillPointsCard & keyof SkillPointsCardAttributes as `prop:${K}`]?: SkillPointsCard[K] };
     }
 }
 export { LocalJSX as JSX };
@@ -134,6 +165,7 @@ declare module "@stencil/core" {
             "guide-view": LocalJSX.IntrinsicElements["guide-view"] & JSXBase.HTMLAttributes<HTMLGuideViewElement>;
             "latest-release": LocalJSX.IntrinsicElements["latest-release"] & JSXBase.HTMLAttributes<HTMLLatestReleaseElement>;
             "project-page": LocalJSX.IntrinsicElements["project-page"] & JSXBase.HTMLAttributes<HTMLProjectPageElement>;
+            "skill-points-card": LocalJSX.IntrinsicElements["skill-points-card"] & JSXBase.HTMLAttributes<HTMLSkillPointsCardElement>;
         }
     }
 }

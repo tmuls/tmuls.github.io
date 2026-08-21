@@ -78,3 +78,26 @@ body {
     display: none;
   }
 }
+
+/* Shared card shell for any sidebar component (latest-release,
+   skill-points-card, etc.), so they stack together consistently. */
+.sidebar-card {
+  padding: 1.5rem;
+  background-color: #14161a;
+  border: 1px solid #2a2d33;
+  border-radius: 16px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.sidebar-card + .sidebar-card {
+  margin-top: 1.25rem;
+}
+
+.sidebar-card-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8a8d94;
+}

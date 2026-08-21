@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 
 const guidesDir = 'src/pages/guide/content';
 const outDir = 'www/assets/guides';
@@ -19,6 +19,31 @@ function parseFrontmatter(raw) {
     data[key] = value;
   }
   return { data, body: body.replace(/^\r?\n+/, '') };
+}
+
+function resolveSidebar(file, data) {
+  // Optional sidebar sidecar: auto-detected as "<same-basename>.json" next to
+  // the guide's .md file, or overridden explicitly via a "sidebar:" frontmatter
+  // field naming a different .json file in the same content directory. Either
+  // way, no reference is required inside the markdown for the default case.
+  const sidecarName = data.sidebar || `${basename(file, '.md')}.json`;
+  const sidecarPath = join(guidesDir, sidecarName);
+
+  if (!existsSync(sidecarPath)) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(readFileSync(sidecarPath, 'utf8'));
+    if (!Array.isArray(parsed)) {
+      console.warn(`Skipping sidebar for ${file}: ${sidecarName} must be a JSON array.`);
+      return [];
+    }
+    return parsed;
+  } catch (e) {
+    console.warn(`Skipping sidebar for ${file}: failed to parse ${sidecarName} (${e.message}).`);
+    return [];
+  }
 }
 
 function toExcerpt(markdown, length = 200) {
@@ -70,6 +95,7 @@ for (const file of files) {
     project: data.project || null,
     priority: Number.isFinite(priority) ? priority : null,
     excerpt: toExcerpt(body),
+    sidebar: resolveSidebar(file, data),
   });
 
   writeFileSync(join(outDir, `${data.id}.md`), body, 'utf8');

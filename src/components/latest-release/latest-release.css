@@ -1,20 +1,3 @@
-.sidebar-card {
-  padding: 1.5rem;
-  background-color: #14161a;
-  border: 1px solid #2a2d33;
-  border-radius: 16px;
-  text-align: center;
-  overflow: hidden;
-}
-
-.sidebar-card-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #8a8d94;
-}
-
 .sidebar-card-status {
   margin-top: 1rem;
   color: #c7c9ce;
