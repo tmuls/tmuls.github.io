@@ -1,7 +1,19 @@
-.site-navbar {
+/* nav.site-navbar (not just .site-navbar) so this reliably beats Bulma's
+   same-specificity .navbar{position:relative} rule — Stencil injects
+   component styles before the global stylesheet <link>, so on a tie
+   Bulma's rule would otherwise win regardless of source order here. */
+nav.site-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 1px solid #2a2d33;
+  box-sizing: border-box;
 }
 
 .hamburger {

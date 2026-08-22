@@ -2,6 +2,7 @@ import { Component, Host, h } from '@stencil/core';
 
 @Component({
   tag: 'app-layout',
+  styleUrl: 'app-layout.css',
 })
 export class AppLayout {
   render() {

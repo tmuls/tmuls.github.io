@@ -2,6 +2,13 @@
 
 /* Shared site theme: dark background with a subtle repeating noise texture.
    Used by every page (Stencil-rendered or plain static) so the look stays consistent. */
+:root {
+  /* The fixed nav's height — single source of truth for both the nav's
+     own box and anything else that needs to sit or offset below it
+     (main's top padding, the hero background's top offset). */
+  --nav-height: 4.25rem;
+}
+
 html,
 body {
   margin: 0;
@@ -22,7 +29,7 @@ body {
 }
 
 .site-navbar {
-  background: transparent !important;
+  background-color: #14161a !important;
   box-shadow: none;
   padding: 0.5rem 1rem;
 }

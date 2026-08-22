@@ -1,21 +1,17 @@
-.project-hero {
-  position: relative;
-}
-
-/* The hero is just a background band sitting behind the page, sized
-   on its own (not by the title's box) so it can bleed past the title
-   and fade out over the content below instead of forcing empty space
-   into the title's own box. */
+/* The hero is just a background band pinned to the viewport (below the
+   fixed nav) — the page's real content, including the title, is normal
+   flow and scrolls right over it. */
 
 /* Layer 1 (deepest): nothing painted here — the page's own textured
    html background shows straight through, so it lines up with the
    section below with no seam. */
 
 /* Layer 2: the artwork, masked to fade to transparent toward the
-   bottom so it blends into the shared page background. */
+   bottom so it blends into the shared page background. Fixed so it
+   stays put while the content scrolls over it. */
 .hero-image {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: var(--nav-height);
   left: 0;
   right: 0;
   height: 260px;
@@ -29,10 +25,10 @@
 
 /* Layer 3: a dark scrim over the art (for text legibility), also fading
    to fully transparent — never to a flat color — so nothing occludes
-   the shared textured background underneath. */
+   the shared textured background underneath. Fixed alongside the art. */
 .hero-fade {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: var(--nav-height);
   left: 0;
   right: 0;
   height: 260px;
@@ -42,16 +38,16 @@
 }
 
 /* Layer 4 (topmost): the text, sized to its own content so the hero
-   doesn't leave empty space below it — the artwork keeps flowing
-   behind whatever comes next regardless of how tall this is. */
+   doesn't leave empty space below it. Normal flow (not fixed) — it
+   scrolls away like the rest of the page. */
 .hero-content {
   position: relative;
   z-index: 2;
   padding: 1.75rem 1.5rem 1.5rem;
 }
 
-/* Keeps the section below painting in front of the hero artwork
-   bleeding past the (now content-sized) hero box. */
+/* Everything after the hero is normal scrolling content too, and needs
+   to paint in front of the fixed artwork it scrolls over. */
 .project-hero + .section {
   position: relative;
   z-index: 1;
