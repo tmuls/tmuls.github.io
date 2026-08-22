@@ -1,1 +1,1 @@
-T13+ weapon aspect, use accuracy links as needed to target 107% accuracy.
+For low aspect, trade focus for magic resist or use accuracy links to 107% accuracy.
