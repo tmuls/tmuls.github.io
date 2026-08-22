@@ -24,11 +24,6 @@ export class ProjectPage {
           {this.heroImage && <div class="hero-fade"></div>}
           <div class="hero-content">
             <div class="container">
-              <a href="/" class="has-text-grey-light back-link">
-                &larr; Back to projects
-              </a>
-            </div>
-            <div class="container">
               <h1 class="title is-2 has-text-light">{this.pageTitle}</h1>
               {this.tagline && <p class="subtitle is-5 has-text-grey-light">{this.tagline}</p>}
             </div>

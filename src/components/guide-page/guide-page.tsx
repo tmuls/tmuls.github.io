@@ -3,7 +3,7 @@ import { Component, State, h } from '@stencil/core';
 // The page mounted by /guide/index.html. It only ever renders a guide - a
 // listing of a folder's guides isn't something this route does at all; that
 // gets embedded directly wherever it's needed (e.g. <guide-list> on
-// /uo/index.html), same as any other page-specific content. There's no
+// /index.html), same as any other page-specific content. There's no
 // reliable single URL to send "back" to for an arbitrary guide id, so this
 // just retraces whatever page the visitor actually came from.
 @Component({

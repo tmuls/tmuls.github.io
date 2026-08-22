@@ -2,14 +2,44 @@
 <html dir="ltr" lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <title>Muls</title>
+  <title>Ultima Online Outlands</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
-  <meta name="description" content="Muls&#39; personal website">
-  <link rel="stylesheet" href="/build/app.css">
-  <script type="module" src="/build/app.esm.js"></script>
-  <script nomodule src="/build/app.js"></script>
+  <meta name="description" content="Guides and scripts for Ultima Online Outlands">
+  <link rel="stylesheet" href="/build/app.css?v=f4cfbe1e7d">
+  <script type="module" src="/build/app.esm.js?v=f4cfbe1e7d"></script>
+  <script nomodule src="/build/app.js?v=f4cfbe1e7d"></script>
 </head>
 <body>
-  <app-home></app-home>
+  <project-page
+    page-title="Ultima Online Outlands"
+    tagline="Guides and scripts for Ultima Online Outlands"
+    hero-image="/assets/projects/uo-outlands.svg?v=2"
+  >
+    <div class="columns">
+      <div class="column is-two-thirds">
+        <div class="content-section">
+          <h2 class="title is-4 has-text-light">Guides</h2>
+          <guide-list></guide-list>
+        </div>
+
+        <div class="content-section">
+          <h2 class="title is-4 has-text-light">Scripts</h2>
+          <div class="script-list">
+            <div class="script-entry">
+              <h3 class="title is-5 has-text-light">Muls Dexxer Bot</h3>
+              <p class="has-text-grey-light">Optimized dexxer bot forked from Jaseowns premium dexxer bot with several enhancements</p>
+              <a class="script-link" href="https://github.com/tmuls/muls-dexxer-bot" target="_blank" rel="noopener noreferrer">
+                View on GitHub &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="column sidebar-column">
+        <h2 class="title is-4 sidebar-spacer" aria-hidden="true">&nbsp;</h2>
+        <latest-release></latest-release>
+      </div>
+    </div>
+  </project-page>
 </body>
 </html>

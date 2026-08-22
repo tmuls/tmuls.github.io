@@ -10,7 +10,6 @@ export const config: Config = {
       dir: 'www',
       empty: true,
       copy: [
-        { src: 'pages/uo/index.html', dest: 'uo/index.html' },
         { src: 'pages/guide/index.html', dest: 'guide/index.html' },
         { src: 'pages/guide/content', dest: 'assets/guides' },
       ],

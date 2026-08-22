@@ -6,11 +6,6 @@ interface NavLink {
   external?: boolean;
 }
 
-interface NavSection {
-  label: string;
-  children: NavLink[];
-}
-
 @Component({
   tag: 'app-nav',
   styleUrl: 'app-nav.css',
@@ -19,13 +14,6 @@ export class AppNav {
   @State() isOpen = false;
 
   private topLinks: NavLink[] = [{ label: 'Home', url: '/' }];
-
-  private sections: NavSection[] = [
-    {
-      label: 'Projects',
-      children: [{ label: 'Ultima Online Outlands', url: '/uo/' }],
-    },
-  ];
 
   private bottomLinks: NavLink[] = [{ label: 'YouTube', url: 'https://www.youtube.com/@e_muls', external: true }];
 
@@ -51,12 +39,11 @@ export class AppNav {
     return path === url || path === url.replace(/\/$/, '');
   }
 
-  private renderLink(link: NavLink, isChild = false) {
+  private renderLink(link: NavLink) {
     return (
       <a
         class={{
           'drawer-link': true,
-          'drawer-child': isChild,
           'is-active': this.isActive(link.url),
         }}
         href={link.url}
@@ -103,14 +90,6 @@ export class AppNav {
           </div>
           <div class="side-drawer-body">
             {this.topLinks.map((link) => this.renderLink(link))}
-
-            {this.sections.map((section) => (
-              <div class="drawer-section">
-                <div class="drawer-section-title">{section.label}</div>
-                {section.children.map((link) => this.renderLink(link, true))}
-              </div>
-            ))}
-
             {this.bottomLinks.map((link) => this.renderLink(link))}
           </div>
         </aside>

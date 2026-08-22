@@ -6,13 +6,14 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface AppHome {
-    }
     interface AppLayout {
     }
     interface AppNav {
     }
     interface GuideList {
+        /**
+          * @default ''
+         */
         "guideId": string;
     }
     interface GuidePage {
@@ -51,12 +52,6 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
-    }
-    var HTMLAppHomeElement: {
-        prototype: HTMLAppHomeElement;
-        new (): HTMLAppHomeElement;
-    };
     interface HTMLAppLayoutElement extends Components.AppLayout, HTMLStencilElement {
     }
     var HTMLAppLayoutElement: {
@@ -106,7 +101,6 @@ declare global {
         new (): HTMLSkillPointsCardElement;
     };
     interface HTMLElementTagNameMap {
-        "app-home": HTMLAppHomeElement;
         "app-layout": HTMLAppLayoutElement;
         "app-nav": HTMLAppNavElement;
         "guide-list": HTMLGuideListElement;
@@ -120,14 +114,15 @@ declare global {
 declare namespace LocalJSX {
     type OneOf<K extends string, PropT, AttrT = PropT> = { [P in K]: PropT } & { [P in `attr:${K}`]?: never } | { [P in `attr:${K}`]: AttrT } & { [P in K]?: never };
 
-    interface AppHome {
-    }
     interface AppLayout {
     }
     interface AppNav {
     }
     interface GuideList {
-        "guideId": string;
+        /**
+          * @default ''
+         */
+        "guideId"?: string;
     }
     interface GuidePage {
     }
@@ -181,10 +176,9 @@ declare namespace LocalJSX {
     }
 
     interface IntrinsicElements {
-        "app-home": AppHome;
         "app-layout": AppLayout;
         "app-nav": AppNav;
-        "guide-list": Omit<GuideList, keyof GuideListAttributes> & { [K in keyof GuideList & keyof GuideListAttributes]?: GuideList[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `attr:${K}`]?: GuideListAttributes[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `prop:${K}`]?: GuideList[K] } & OneOf<"guideId", GuideList["guideId"], GuideListAttributes["guideId"]>;
+        "guide-list": Omit<GuideList, keyof GuideListAttributes> & { [K in keyof GuideList & keyof GuideListAttributes]?: GuideList[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `attr:${K}`]?: GuideListAttributes[K] } & { [K in keyof GuideList & keyof GuideListAttributes as `prop:${K}`]?: GuideList[K] };
         "guide-page": GuidePage;
         "guide-view": Omit<GuideView, keyof GuideViewAttributes> & { [K in keyof GuideView & keyof GuideViewAttributes]?: GuideView[K] } & { [K in keyof GuideView & keyof GuideViewAttributes as `attr:${K}`]?: GuideViewAttributes[K] } & { [K in keyof GuideView & keyof GuideViewAttributes as `prop:${K}`]?: GuideView[K] } & OneOf<"guideId", GuideView["guideId"], GuideViewAttributes["guideId"]>;
         "latest-release": LatestRelease;
@@ -196,7 +190,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "app-home": LocalJSX.IntrinsicElements["app-home"] & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-layout": LocalJSX.IntrinsicElements["app-layout"] & JSXBase.HTMLAttributes<HTMLAppLayoutElement>;
             "app-nav": LocalJSX.IntrinsicElements["app-nav"] & JSXBase.HTMLAttributes<HTMLAppNavElement>;
             "guide-list": LocalJSX.IntrinsicElements["guide-list"] & JSXBase.HTMLAttributes<HTMLGuideListElement>;

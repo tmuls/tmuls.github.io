@@ -107,19 +107,6 @@
   padding: 0.5rem 0 1.5rem;
 }
 
-.drawer-section {
-  margin-top: 0.5rem;
-}
-
-.drawer-section-title {
-  padding: 1rem 1.25rem 0.35rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: #8a8d94;
-}
-
 .drawer-link {
   position: relative;
   display: flex;
@@ -135,12 +122,6 @@
 .drawer-link:hover {
   background-color: rgba(201, 164, 92, 0.08);
   color: #ffffff;
-}
-
-.drawer-link.drawer-child {
-  padding-left: 2.25rem;
-  font-size: 0.92rem;
-  color: #c7c9ce;
 }
 
 .drawer-indicator {
