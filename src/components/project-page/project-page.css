@@ -1,23 +1,30 @@
 .project-hero {
   position: relative;
-  min-height: 260px;
-  overflow: hidden;
 }
+
+/* The hero is just a background band sitting behind the page, sized
+   on its own (not by the title's box) so it can bleed past the title
+   and fade out over the content below instead of forcing empty space
+   into the title's own box. */
 
 /* Layer 1 (deepest): nothing painted here — the page's own textured
    html background shows straight through, so it lines up with the
    section below with no seam. */
 
-/* Layer 2: the artwork, filling the hero, masked to fade to transparent
-   toward the bottom so it blends into the shared page background. */
+/* Layer 2: the artwork, masked to fade to transparent toward the
+   bottom so it blends into the shared page background. */
 .hero-image {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 260px;
   z-index: 0;
   background-size: cover;
   background-position: center;
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
   mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Layer 3: a dark scrim over the art (for text legibility), also fading
@@ -25,20 +32,29 @@
    the shared textured background underneath. */
 .hero-fade {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 260px;
   z-index: 1;
   background-image: linear-gradient(180deg, rgba(20, 22, 26, 0.6) 0%, rgba(20, 22, 26, 0.4) 40%, transparent 70%);
+  pointer-events: none;
 }
 
-/* Layer 4 (topmost): the text. */
+/* Layer 4 (topmost): the text, sized to its own content so the hero
+   doesn't leave empty space below it — the artwork keeps flowing
+   behind whatever comes next regardless of how tall this is. */
 .hero-content {
   position: relative;
   z-index: 2;
-  min-height: 260px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 1.75rem 1.5rem 2rem;
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+/* Keeps the section below painting in front of the hero artwork
+   bleeding past the (now content-sized) hero box. */
+.project-hero + .section {
+  position: relative;
+  z-index: 1;
 }
 
 .project-hero .title {
@@ -79,12 +95,12 @@
 }
 
 @media (max-width: 600px) {
-  .project-hero {
-    min-height: 200px;
+  .hero-image,
+  .hero-fade {
+    height: 200px;
   }
 
   .hero-content {
-    min-height: 200px;
-    padding: 1.25rem 1.25rem 1.5rem;
+    padding: 1.25rem 1.25rem 1.25rem;
   }
 }
