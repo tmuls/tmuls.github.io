@@ -22,7 +22,7 @@
             { "color": "gold", "name": "Damage Dealt By Player" },
             { "color": "gold", "name": "Melee Special Chance/Special Damage" },
             { "color": "gold", "name": "Melee Damage/Ignore Armor Chance" },
-            { "color": "silver", "name": "Melee Accuracy", "note": "as needed to maintain 107% accuracy" }
+            { "color": "silver", "name": "Melee Accuracy", "note": "as needed to maintain 104% accuracy" }
           ]
         },
         {
@@ -43,7 +43,7 @@
             { "color": "gold", "name": "Damage Dealt By Player" },
             { "color": "gold", "name": "Melee Special Chance/Special Damage" },
             { "color": "gold", "name": "Melee Damage/Ignore Armor Chance" },
-            { "color": "silver", "name": "Melee Accuracy", "note": "as needed to maintain 107% accuracy" }
+            { "color": "silver", "name": "Melee Accuracy", "note": "as needed to maintain 104% accuracy" }
           ]
         }
       ]
