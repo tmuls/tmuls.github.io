@@ -10,6 +10,7 @@
   --chip-text: #0f172a;
   --danger: #ef4444;
   --border: #334155;
+  --court-orange: #f97316;
 }
 
 * {
@@ -105,6 +106,111 @@ button {
   font-size: 0.85rem;
   font-weight: 600;
   text-align: center;
+}
+
+.court-section {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto 20px;
+}
+
+.court-label {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  z-index: 1;
+  color: var(--court-orange);
+  font-weight: 800;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.court {
+  position: relative;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 2px solid var(--court-orange);
+  box-shadow:
+    0 0 16px 4px rgba(249, 115, 22, 0.5),
+    0 0 48px 16px rgba(249, 115, 22, 0.3);
+}
+
+.court-net {
+  background: repeating-linear-gradient(45deg, #475569, #475569 4px, #1e293b 4px, #1e293b 8px);
+  border: 2px solid #0f172a;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  padding: 5px 0;
+  font-size: 0.75rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.court-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.court-row + .court-row {
+  margin-top: 6px;
+}
+
+.court-cell {
+  position: relative;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.court-pos-num {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.court-player-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.court-cell.empty .court-player-name {
+  color: var(--muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.court-player-jersey {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.court-server-tag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--court-orange);
 }
 
 .board {

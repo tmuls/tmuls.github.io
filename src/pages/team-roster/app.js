@@ -5,7 +5,12 @@
   const URL_PARAM = "data";
   const COURT_SIZE = 6;
 
+  // On-court list index -> volleyball court position, walking the standard
+  // clockwise rotation order (server at position 1, back row, then around).
+  const COURT_POSITIONS = [1, 6, 5, 4, 3, 2];
+
   const listEl = document.getElementById("player-list");
+  const courtEl = document.getElementById("court");
   const addForm = document.getElementById("add-form");
   const nameInput = document.getElementById("player-name");
   const rotateBackBtn = document.getElementById("rotate-back-btn");
@@ -187,10 +192,11 @@
     const bench = players.filter((p) => p.bench);
     if (active.length < 2) return;
 
+    // Forward = standard volleyball clockwise rotation (2->1->6->5->4->3->2).
     if (direction === "forward") {
-      active.push(active.shift());
-    } else {
       active.unshift(active.pop());
+    } else {
+      active.push(active.shift());
     }
 
     players = [...active, ...bench];
@@ -200,8 +206,44 @@
 
   // ---------- rendering ----------
 
+  function renderCourt() {
+    const active = players.filter((p) => !p.bench);
+
+    COURT_POSITIONS.forEach((pos, index) => {
+      const cell = courtEl.querySelector(`.court-cell[data-pos="${pos}"]`);
+      const player = active[index];
+      cell.classList.toggle("empty", !player);
+      cell.innerHTML = "";
+
+      const posNum = document.createElement("span");
+      posNum.className = "court-pos-num";
+      posNum.textContent = pos;
+      cell.appendChild(posNum);
+
+      const name = document.createElement("span");
+      name.className = "court-player-name";
+      name.textContent = player ? player.name : "—";
+      cell.appendChild(name);
+
+      if (player) {
+        const jersey = document.createElement("span");
+        jersey.className = "court-player-jersey";
+        jersey.textContent = `#${player.number}`;
+        cell.appendChild(jersey);
+      }
+
+      if (pos === 1) {
+        const tag = document.createElement("span");
+        tag.className = "court-server-tag";
+        tag.textContent = "Server";
+        cell.appendChild(tag);
+      }
+    });
+  }
+
   function render() {
     listEl.innerHTML = "";
+    renderCourt();
 
     const active = players.filter((p) => !p.bench);
     const bench = players.filter((p) => p.bench);
