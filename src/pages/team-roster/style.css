@@ -53,7 +53,9 @@ body {
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--text);
-  font-size: 0.95rem;
+  /* iOS Safari auto-zooms the page on focus for any input with a computed
+     font-size under 16px; 16px is the actual fix, not a viewport hack. */
+  font-size: 16px;
   min-width: 160px;
 }
 
@@ -392,7 +394,9 @@ button {
   color: var(--chip-text);
   text-align: center;
   font-weight: 700;
-  font-size: 0.8rem;
+  /* Same 16px-minimum rule as .add-form input, so tapping to edit a jersey
+     number doesn't trigger iOS Safari's zoom-on-focus either. */
+  font-size: 16px;
 }
 
 .player-name {
@@ -419,7 +423,9 @@ button {
   background: white;
   color: var(--chip-text);
   font-weight: 600;
-  font-size: 0.95rem;
+  /* Same 16px-minimum rule as .add-form input: this is the input that was
+     visibly zooming in on tap-to-edit. */
+  font-size: 16px;
 }
 
 .remove-btn {
