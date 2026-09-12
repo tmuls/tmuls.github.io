@@ -357,8 +357,6 @@
       input.min = "1";
       input.className = "player-number-input";
       input.value = player.number;
-      input.addEventListener("pointerdown", (e) => e.stopPropagation());
-      input.addEventListener("click", (e) => e.stopPropagation());
       input.addEventListener("blur", () => setPlayerNumber(player.id, input.value));
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") input.blur();
@@ -378,9 +376,7 @@
 
     if (!locked) {
       badge.title = "Tap to change number";
-      badge.addEventListener("pointerdown", (e) => e.stopPropagation());
-      badge.addEventListener("click", (e) => {
-        e.stopPropagation();
+      badge.addEventListener("click", () => {
         editingNumberId = player.id;
         render();
       });
@@ -397,6 +393,7 @@
     const handle = document.createElement("span");
     handle.className = "drag-handle";
     handle.textContent = "⋮⋮";
+    handle.addEventListener("pointerdown", onRowPointerDown);
     row.appendChild(handle);
 
     row.appendChild(createNumberEl(player));
@@ -412,14 +409,8 @@
     removeBtn.textContent = "×";
     removeBtn.title = "Remove player";
     removeBtn.disabled = locked;
-    removeBtn.addEventListener("pointerdown", (e) => e.stopPropagation());
-    removeBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      removePlayer(player.id);
-    });
+    removeBtn.addEventListener("click", () => removePlayer(player.id));
     row.appendChild(removeBtn);
-
-    row.addEventListener("pointerdown", onRowPointerDown);
 
     return row;
   }
@@ -432,7 +423,7 @@
     if (locked) return;
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
-    const row = e.currentTarget;
+    const row = e.currentTarget.closest(".player-row");
     const id = row.dataset.id;
     const rect = row.getBoundingClientRect();
 
