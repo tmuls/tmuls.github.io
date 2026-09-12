@@ -36,9 +36,41 @@ body {
 }
 
 .app-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.4rem;
   margin: 0;
   margin-right: auto;
+}
+
+/* Filled-stencil volleyball: a solid silhouette (.volley-fill, colored via
+   currentColor so each context can just set `color`) with curved seam paths
+   (.volley-seam) stroked in whatever sits directly behind the icon, so the
+   seams read as cutouts rather than drawn lines — same technique everywhere
+   this icon appears (header logo, locked-row serving indicator), just with
+   different `color` / `--seam-color` per background. */
+.volley-icon {
+  flex: 0 0 auto;
+  display: block;
+}
+
+.volley-fill {
+  fill: currentColor;
+}
+
+.volley-seam {
+  fill: none;
+  stroke: var(--seam-color, var(--bg));
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.app-logo {
+  width: 30px;
+  height: 30px;
+  color: white;
+  --seam-color: var(--bg);
 }
 
 .add-form {
@@ -455,18 +487,15 @@ button {
   min-width: 20px;
 }
 
-.ball-icon {
+.row-trailing .volley-icon {
   width: 20px;
   height: 20px;
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  color: var(--muted);
+  --seam-color: var(--chip);
 }
 
-.ball-icon.serving {
-  stroke: var(--court-orange);
+.row-trailing .volley-icon.serving {
+  color: var(--court-orange);
 }
 
 .serving-label {

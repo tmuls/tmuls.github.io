@@ -584,12 +584,16 @@
     return badge;
   }
 
-  const BALL_SVG = `
-    <svg class="ball-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="9"></circle>
-      <path d="M12 3C15 7 15 17 12 21"></path>
-      <path d="M4.8 7.2C9 10 15 14 19.2 16.8"></path>
-      <path d="M4.8 16.8C9 14 15 10 19.2 7.2"></path>
+  // Same filled-stencil volleyball as the header logo (index.html): a solid
+  // silhouette (.volley-fill) with curved seam paths (.volley-seam) stroked
+  // in whatever color sits behind the icon in each context, so the seams
+  // read as cutouts rather than drawn lines.
+  const VOLLEY_SVG = `
+    <svg class="volley-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle class="volley-fill" cx="12" cy="12" r="11"></circle>
+      <path class="volley-seam" d="M12 1C16 6 16 18 12 23"></path>
+      <path class="volley-seam" d="M2.8 5.9C9 10 15 14 21.2 18.1"></path>
+      <path class="volley-seam" d="M2.8 18.1C9 14 15 10 21.2 5.9"></path>
     </svg>
   `;
 
@@ -637,12 +641,13 @@
       return removeBtn;
     }
 
-    // Removing is disabled while locked, so swap the X for a purely
-    // informational volleyball icon; the current server's is highlighted.
+    // Removing is disabled while locked, so swap the remove button for a
+    // purely informational volleyball icon; the current server's is
+    // highlighted.
     const trailing = document.createElement("div");
     trailing.className = "row-trailing";
-    trailing.innerHTML = BALL_SVG + (isServing ? '<span class="serving-label">serving</span>' : "");
-    if (isServing) trailing.querySelector(".ball-icon").classList.add("serving");
+    trailing.innerHTML = VOLLEY_SVG + (isServing ? '<span class="serving-label">serving</span>' : "");
+    if (isServing) trailing.querySelector(".volley-icon").classList.add("serving");
     return trailing;
   }
 

@@ -3,12 +3,20 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Team Roster</title>
+<title>Volley Roster</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="app-header">
-    <h1>Team Roster</h1>
+    <h1>
+      <svg class="volley-icon app-logo" viewBox="0 0 24 24" aria-hidden="true">
+        <circle class="volley-fill" cx="12" cy="12" r="11"></circle>
+        <path class="volley-seam" d="M12 1C16 6 16 18 12 23"></path>
+        <path class="volley-seam" d="M2.8 5.9C9 10 15 14 21.2 18.1"></path>
+        <path class="volley-seam" d="M2.8 18.1C9 14 15 10 21.2 5.9"></path>
+      </svg>
+      Volley Roster
+    </h1>
     <form id="add-form" class="add-form">
       <input type="text" id="player-name" placeholder="Player name" maxlength="40" required />
       <button type="submit">Add Player</button>
