@@ -1,0 +1,243 @@
+:root {
+  color-scheme: light dark;
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --panel-alt: #16213a;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --accent: #22c55e;
+  --accent-dark: #16a34a;
+  --chip: #f8fafc;
+  --chip-text: #0f172a;
+  --danger: #ef4444;
+  --border: #334155;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.app-header h1 {
+  font-size: 1.4rem;
+  margin: 0;
+  margin-right: auto;
+}
+
+.add-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.add-form input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.95rem;
+  min-width: 160px;
+}
+
+button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.add-form button {
+  background: var(--accent);
+  border-color: var(--accent-dark);
+  color: #052e16;
+  font-weight: 600;
+}
+
+.add-form button:hover {
+  background: var(--accent-dark);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.board {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.roster-panel {
+  flex: 3 1 480px;
+}
+
+.bench-panel {
+  flex: 1 1 220px;
+  min-width: 220px;
+}
+
+h2 {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.roster-field {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 2px,
+      transparent 2px,
+      transparent 48px
+    ),
+    linear-gradient(160deg, #14532d, #166534 45%, #15803d 100%);
+  border: 2px solid #14532d;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.roster-field::before {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.roster-field::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 6%;
+  right: 6%;
+  height: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
+
+.bench-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 200px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--panel-alt);
+  border: 2px dashed var(--border);
+}
+
+.bench-list.drag-over,
+.roster-field.drag-over {
+  border-color: var(--accent);
+}
+
+.bench-empty {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 24px 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--chip);
+  color: var(--chip-text);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.chip:active {
+  cursor: grabbing;
+}
+
+.roster-field .chip {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.chip.dragging {
+  opacity: 0.35;
+}
+
+.chip .remove-btn {
+  border: none;
+  background: var(--danger);
+  color: white;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.drag-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.95;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+  max-width: 720px;
+  margin-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .board {
+    flex-direction: column;
+  }
+  .roster-panel,
+  .bench-panel {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .roster-field {
+    min-height: 380px;
+  }
+}

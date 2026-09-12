@@ -12,6 +12,7 @@ export const config: Config = {
       copy: [
         { src: 'pages/guide/index.html', dest: 'guide/index.html' },
         { src: 'pages/guide/content', dest: 'assets/guides' },
+        { src: 'pages/team-roster', dest: 'team-roster' },
       ],
     },
   ],
