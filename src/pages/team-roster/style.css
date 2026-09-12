@@ -109,21 +109,8 @@ button {
 }
 
 .court-section {
-  position: relative;
   max-width: 640px;
   margin: 0 auto 20px;
-}
-
-.court-label {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  z-index: 1;
-  color: var(--court-orange);
-  font-weight: 800;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
 .court {

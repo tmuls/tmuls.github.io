@@ -4,8 +4,11 @@
   const STORAGE_KEY = "teamRosterData";
   const URL_PARAM = "data";
   const COURT_SIZE = 6;
-  const STATUS_ORDER = ["court", "bench", "absent"];
-  const STATUS_LABELS = { bench: "On Bench", absent: "Absent" };
+
+  // Only two real, assignable categories: present players rotate through
+  // on-court/on-bench purely by their position in the list (top COURT_SIZE
+  // = on court). Absent players are a separate pool, excluded from rotation.
+  const STATUS_ORDER = ["present", "absent"];
 
   // On-court list index -> volleyball court position, walking the standard
   // clockwise rotation order (server at position 1, back row, then around).
@@ -22,7 +25,7 @@
   const shareBtn = document.getElementById("share-btn");
   const resetBtn = document.getElementById("reset-btn");
 
-  /** @type {{ id: string, name: string, status: "court" | "bench" | "absent", number: number }[]} */
+  /** @type {{ id: string, name: string, absent: boolean, number: number }[]} */
   let players = [];
   let locked = false;
   let editingNumberId = null;
@@ -61,19 +64,21 @@
       .map((p) => ({
         id: typeof p.id === "string" ? p.id : makeId(),
         name: p.name,
-        status: sanitizeStatus(p),
+        absent: sanitizeAbsent(p),
         number: Number.isInteger(p.number) && p.number > 0 ? p.number : null,
       }));
     assignMissingNumbers(list);
     return list;
   }
 
-  function sanitizeStatus(p) {
-    if (STATUS_ORDER.includes(p.status)) return p.status;
-    // Migrate the old two-state { bench: boolean } shape: bench players
-    // land in the new "bench" tier rather than "absent".
-    if (typeof p.bench === "boolean") return p.bench ? "bench" : "court";
-    return "bench";
+  function sanitizeAbsent(p) {
+    if (typeof p.absent === "boolean") return p.absent;
+    // Migrate the old three-state { status: "court"|"bench"|"absent" } shape.
+    if (p.status === "absent") return true;
+    if (p.status === "court" || p.status === "bench") return false;
+    // Oldest two-state { bench: boolean } shape: both were present players,
+    // court/bench is now purely positional, so just mark them present.
+    return false;
   }
 
   function assignMissingNumbers(list) {
@@ -150,7 +155,10 @@
 
   function addPlayer(name) {
     if (locked) return;
-    players.push({ id: makeId(), name: name.trim(), status: "bench", number: nextAvailableNumber() });
+    const present = players.filter((p) => !p.absent);
+    const absent = players.filter((p) => p.absent);
+    present.push({ id: makeId(), name: name.trim(), absent: false, number: nextAvailableNumber() });
+    players = [...present, ...absent];
     render();
     persistState();
   }
@@ -182,33 +190,38 @@
     const dragged = players.find((p) => p.id === id);
     if (!dragged) return;
 
-    const groups = { court: [], bench: [], absent: [] };
+    const groups = { present: [], absent: [] };
     for (const p of players) {
       if (p.id === id) continue;
-      groups[p.status].push(p);
+      groups[p.absent ? "absent" : "present"].push(p);
     }
 
-    dragged.status = targetStatus;
+    dragged.absent = targetStatus === "absent";
     groups[targetStatus].splice(index, 0, dragged);
 
-    players = STATUS_ORDER.flatMap((status) => groups[status]);
+    players = [...groups.present, ...groups.absent];
     render();
     persistState();
   }
 
   function rotateCourt(direction) {
-    const court = players.filter((p) => p.status === "court");
-    const rest = players.filter((p) => p.status !== "court");
-    if (court.length < 2) return;
+    // Rotates the whole present queue, not just the current on-court 6, so
+    // bench players cycle onto the court over successive rotations. Absent
+    // players are excluded entirely.
+    const present = players.filter((p) => !p.absent);
+    const absent = players.filter((p) => p.absent);
+    if (present.length < 2) return;
 
-    // Forward = standard volleyball clockwise rotation (2->1->6->5->4->3->2).
+    // Forward = standard volleyball clockwise rotation (2->1->6->5->4->3->2)
+    // when exactly 6 are present; with more present, it also rotates the
+    // next bench player onto the court.
     if (direction === "forward") {
-      court.unshift(court.pop());
+      present.unshift(present.pop());
     } else {
-      court.push(court.shift());
+      present.push(present.shift());
     }
 
-    players = [...court, ...rest];
+    players = [...present, ...absent];
     render();
     persistState();
   }
@@ -216,7 +229,7 @@
   // ---------- rendering ----------
 
   function renderCourt() {
-    const court = players.filter((p) => p.status === "court");
+    const court = players.filter((p) => !p.absent).slice(0, COURT_SIZE);
 
     COURT_POSITIONS.forEach((pos, index) => {
       const cell = courtEl.querySelector(`.court-cell[data-pos="${pos}"]`);
@@ -254,9 +267,10 @@
     listEl.innerHTML = "";
     renderCourt();
 
-    const court = players.filter((p) => p.status === "court");
-    const bench = players.filter((p) => p.status === "bench");
-    const absent = players.filter((p) => p.status === "absent");
+    const present = players.filter((p) => !p.absent);
+    const absent = players.filter((p) => p.absent);
+    const onCourt = present.slice(0, COURT_SIZE);
+    const onBench = present.slice(COURT_SIZE);
 
     lockedBanner.hidden = !locked;
     lockBtn.textContent = locked ? "🔓 Unlock Roster" : "🔒 Lock Roster";
@@ -264,21 +278,23 @@
     nameInput.disabled = locked;
     addForm.querySelector("button[type=submit]").disabled = locked;
 
-    listEl.appendChild(sectionLabel(`On Court (${court.length}/${COURT_SIZE})`));
-    if (court.length === 0) {
-      listEl.appendChild(emptyRow("No players on the court. Drag a player above the line to send them in."));
+    listEl.appendChild(sectionLabel(`On Court (${onCourt.length}/${COURT_SIZE})`));
+    if (onCourt.length === 0) {
+      listEl.appendChild(emptyRow("No players on the court. Drag a player up to send them in."));
     } else {
-      court.forEach((player) => listEl.appendChild(createRow(player)));
+      onCourt.forEach((player) => listEl.appendChild(createRow(player)));
     }
 
-    listEl.appendChild(createDivider(STATUS_LABELS.bench));
-    if (bench.length === 0) {
+    // Purely a visual marker of the on-court/on-bench boundary within the
+    // present list — not a real drop-target section (see "sub-divider").
+    listEl.appendChild(createDivider("On Bench", { subDivider: true }));
+    if (onBench.length === 0) {
       listEl.appendChild(emptyRow("No players on the bench."));
     } else {
-      bench.forEach((player) => listEl.appendChild(createRow(player)));
+      onBench.forEach((player) => listEl.appendChild(createRow(player)));
     }
 
-    listEl.appendChild(createDivider(STATUS_LABELS.absent));
+    listEl.appendChild(createDivider("Absent"));
     if (absent.length === 0) {
       listEl.appendChild(emptyRow("No absent players."));
     } else {
@@ -301,9 +317,9 @@
     return el;
   }
 
-  function createDivider(text) {
+  function createDivider(text, { subDivider = false } = {}) {
     const el = document.createElement("div");
-    el.className = "divider-row";
+    el.className = subDivider ? "divider-row sub-divider" : "divider-row";
 
     const lineLeft = document.createElement("span");
     lineLeft.className = "divider-line";
@@ -422,8 +438,8 @@
       if (el === row) continue;
       if (el.classList.contains("player-row")) {
         const player = players.find((p) => p.id === el.dataset.id);
-        others.push({ type: "player", status: player ? player.status : "bench", el, rect: el.getBoundingClientRect() });
-      } else if (el.classList.contains("divider-row")) {
+        others.push({ type: "player", status: player && player.absent ? "absent" : "present", el, rect: el.getBoundingClientRect() });
+      } else if (el.classList.contains("divider-row") && !el.classList.contains("sub-divider")) {
         others.push({ type: "divider", el, rect: el.getBoundingClientRect() });
       }
     }
@@ -551,7 +567,7 @@
   resetBtn.addEventListener("click", () => {
     if (locked) return;
     if (players.length === 0) return;
-    if (!confirm("Remove all players from the roster and bench?")) return;
+    if (!confirm("Remove all players from the roster?")) return;
     players = [];
     render();
     persistState();
