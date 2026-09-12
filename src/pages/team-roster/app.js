@@ -34,6 +34,7 @@
   let players = [];
   let locked = false;
   let editingNumberId = null;
+  let editingNameId = null;
 
   // ---------- base64 helpers (UTF-8 safe) ----------
 
@@ -179,6 +180,19 @@
       }
     }
     editingNumberId = null;
+    render();
+    persistState();
+  }
+
+  function setPlayerName(id, rawValue) {
+    if (!locked) {
+      const player = players.find((p) => p.id === id);
+      const trimmed = rawValue.trim();
+      if (player && trimmed) {
+        player.name = trimmed;
+      }
+    }
+    editingNameId = null;
     render();
     persistState();
   }
@@ -472,6 +486,14 @@
         input.select();
       }
     }
+
+    if (editingNameId) {
+      const input = boardEl.querySelector(".player-name-input");
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
   }
 
   function sectionLabel(text) {
@@ -508,8 +530,16 @@
     return el;
   }
 
+  // Widened 1.5x horizontally from the original 24x24 square glyph, with a
+  // matching 36x24 viewBox (rather than just stretching the old square icon
+  // inside a wider box): the <svg> scales via preserveAspectRatio "meet" by
+  // default, so a wider container around a square viewBox just letterboxes
+  // in extra blank space on the sides instead of actually widening the
+  // drawn shirt. Making the viewBox itself match the container's aspect
+  // ratio (see .player-number's 54x36 in style.css) means the artwork fills
+  // the whole box, giving two-digit numbers real room in the torso.
   const JERSEY_SVG_PATH =
-    "M8 2 L10 2 L12 4 L14 2 L16 2 L20 5 L18 8 L16 7 L16 20 L8 20 L8 7 L6 8 L4 5 Z";
+    "M12 2 L15 2 L18 4 L21 2 L24 2 L30 5 L27 8 L24 7 L24 20 L12 20 L12 7 L9 8 L6 5 Z";
 
   function createNumberEl(player) {
     if (!locked && editingNumberId === player.id) {
@@ -533,19 +563,24 @@
     badge.className = "player-number";
     badge.classList.toggle("locked", locked);
     badge.innerHTML = `
-      <svg class="jersey-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <svg class="jersey-icon" viewBox="0 0 36 24" aria-hidden="true">
         <path d="${JERSEY_SVG_PATH}"></path>
       </svg>
       <span class="jersey-number">${player.number}</span>
     `;
 
-    if (!locked) {
-      badge.title = "Tap to change number";
-      badge.addEventListener("click", () => {
-        editingNumberId = player.id;
-        render();
-      });
-    }
+    badge.title = "Tap to change number";
+    // Always attach the listener (checking the live `locked` value at click
+    // time, not `!locked` at creation time): rotateCourt() re-renders rows
+    // while the roster is locked, which used to skip attaching this listener
+    // entirely for any row rebuilt during that render — leaving it dead even
+    // after unlocking, since unlocking only toggles classes in place and
+    // doesn't rebuild the badges.
+    badge.addEventListener("click", () => {
+      if (locked) return;
+      editingNumberId = player.id;
+      render();
+    });
     return badge;
   }
 
@@ -557,6 +592,39 @@
       <path d="M4.8 16.8C9 14 15 10 19.2 7.2"></path>
     </svg>
   `;
+
+  function createNameEl(player) {
+    if (!locked && editingNameId === player.id) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.maxLength = 40;
+      input.className = "player-name-input";
+      input.value = player.name;
+      input.addEventListener("blur", () => setPlayerName(player.id, input.value));
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") input.blur();
+        if (e.key === "Escape") {
+          editingNameId = null;
+          render();
+        }
+      });
+      return input;
+    }
+
+    const label = document.createElement("span");
+    label.className = "player-name";
+    label.textContent = player.name;
+    label.title = "Tap to edit name";
+    // Always attach the listener (checking the live `locked` value at click
+    // time) rather than gating attachment on `!locked` at creation time —
+    // see the identical fix on the jersey-number badge's click listener.
+    label.addEventListener("click", () => {
+      if (locked) return;
+      editingNameId = player.id;
+      render();
+    });
+    return label;
+  }
 
   function createTrailing(player, isServing) {
     if (!locked) {
@@ -591,12 +659,7 @@
     row.appendChild(handle);
 
     row.appendChild(createNumberEl(player));
-
-    const label = document.createElement("span");
-    label.className = "player-name";
-    label.textContent = player.name;
-    row.appendChild(label);
-
+    row.appendChild(createNameEl(player));
     row.appendChild(createTrailing(player, isServing));
 
     return row;
@@ -735,6 +798,7 @@
   lockBtn.addEventListener("click", () => {
     locked = !locked;
     editingNumberId = null;
+    editingNameId = null;
     updateLockUI();
 
     // Toggle existing row elements in place rather than calling render(),

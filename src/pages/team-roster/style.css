@@ -349,8 +349,8 @@ button {
 .player-number {
   position: relative;
   flex: 0 0 auto;
-  width: 52px;
-  height: 38px;
+  width: 54px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -402,6 +402,24 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.player-row.locked .player-name {
+  cursor: default;
+}
+
+.player-name-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--chip-text);
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .remove-btn {
