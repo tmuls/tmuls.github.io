@@ -220,6 +220,12 @@
     const absent = players.filter((p) => p.absent);
     if (present.length < 2) return;
 
+    // The player making the long jump (server exiting to the back of the
+    // bench line, or the bench tail entering at the front) gets a fancier
+    // animation than the plain one-slot shift everyone else does.
+    const jumpingId = direction === "forward" ? present[0].id : present[present.length - 1].id;
+    const oldRects = capturePlayerRowRects();
+
     if (direction === "forward") {
       present.push(present.shift());
     } else {
@@ -229,6 +235,46 @@
     players = [...present, ...absent];
     render();
     persistState();
+    animateRowMoves(oldRects, jumpingId);
+  }
+
+  function capturePlayerRowRects() {
+    const rects = new Map();
+    boardEl.querySelectorAll(".player-row").forEach((row) => {
+      rects.set(row.dataset.id, row.getBoundingClientRect());
+    });
+    return rects;
+  }
+
+  function animateRowMoves(oldRects, jumpingId) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    boardEl.querySelectorAll(".player-row").forEach((row) => {
+      const oldRect = oldRects.get(row.dataset.id);
+      if (!oldRect) return;
+      const newRect = row.getBoundingClientRect();
+      const dx = oldRect.left - newRect.left;
+      const dy = oldRect.top - newRect.top;
+      if (dx === 0 && dy === 0) return;
+
+      if (row.dataset.id === jumpingId) {
+        // Lift up and to the left partway through, then arc down into its
+        // resting spot, instead of just sliding in a straight line.
+        row.animate(
+          [
+            { transform: `translate(${dx}px, ${dy}px)` },
+            { transform: `translate(${dx * 0.7 - 20}px, ${dy * 0.7 - 20}px)`, offset: 0.35 },
+            { transform: "translate(0, 0)" },
+          ],
+          { duration: 500, easing: "ease-in-out" }
+        );
+      } else {
+        row.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0, 0)" }], {
+          duration: 350,
+          easing: "ease-in-out",
+        });
+      }
+    });
   }
 
   // ---------- rendering ----------
@@ -296,7 +342,7 @@
     if (onCourt.length === 0) {
       listEl.appendChild(emptyRow("No players on the court. Drag a player up to send them in."));
     } else {
-      onCourt.forEach((player) => listEl.appendChild(createRow(player)));
+      onCourt.forEach((player, index) => listEl.appendChild(createRow(player, { isServing: index === 0 })));
     }
 
     // Purely a visual marker of the on-court/on-bench boundary within the
@@ -403,7 +449,36 @@
     return badge;
   }
 
-  function createRow(player) {
+  const BALL_SVG = `
+    <svg class="ball-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 3C15 7 15 17 12 21"></path>
+      <path d="M4.8 7.2C9 10 15 14 19.2 16.8"></path>
+      <path d="M4.8 16.8C9 14 15 10 19.2 7.2"></path>
+    </svg>
+  `;
+
+  function createTrailing(player, isServing) {
+    if (!locked) {
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "remove-btn";
+      removeBtn.textContent = "×";
+      removeBtn.title = "Remove player";
+      removeBtn.addEventListener("click", () => removePlayer(player.id));
+      return removeBtn;
+    }
+
+    // Removing is disabled while locked, so swap the X for a purely
+    // informational volleyball icon; the current server's is highlighted.
+    const trailing = document.createElement("div");
+    trailing.className = "row-trailing";
+    trailing.innerHTML = BALL_SVG + (isServing ? '<span class="serving-label">serving</span>' : "");
+    if (isServing) trailing.querySelector(".ball-icon").classList.add("serving");
+    return trailing;
+  }
+
+  function createRow(player, { isServing = false } = {}) {
     const row = document.createElement("div");
     row.className = "player-row";
     row.classList.toggle("locked", locked);
@@ -422,14 +497,7 @@
     label.textContent = player.name;
     row.appendChild(label);
 
-    const removeBtn = document.createElement("button");
-    removeBtn.type = "button";
-    removeBtn.className = "remove-btn";
-    removeBtn.textContent = "×";
-    removeBtn.title = "Remove player";
-    removeBtn.disabled = locked;
-    removeBtn.addEventListener("click", () => removePlayer(player.id));
-    row.appendChild(removeBtn);
+    row.appendChild(createTrailing(player, isServing));
 
     return row;
   }
@@ -573,12 +641,17 @@
     // which tears down and rebuilds every row from scratch — a freshly
     // created row is already born in its final state with nothing to
     // transition from, so the handle-collapse animation would never play.
+    const serverId = players.filter((p) => !p.absent)[0]?.id;
     boardEl.querySelectorAll(".player-row").forEach((row) => {
       row.classList.toggle("locked", locked);
-      const removeBtn = row.querySelector(".remove-btn");
-      if (removeBtn) removeBtn.disabled = locked;
       const numberEl = row.querySelector(".player-number");
       if (numberEl) numberEl.classList.toggle("locked", locked);
+
+      const player = players.find((p) => p.id === row.dataset.id);
+      const oldTrailing = row.querySelector(".remove-btn, .row-trailing");
+      if (player && oldTrailing) {
+        oldTrailing.replaceWith(createTrailing(player, row.dataset.id === serverId));
+      }
     });
 
     persistState();

@@ -410,9 +410,37 @@ button {
   cursor: pointer;
 }
 
-.remove-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+.row-trailing {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 20px;
+}
+
+.ball-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ball-icon.serving {
+  stroke: var(--court-orange);
+}
+
+.serving-label {
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--court-orange);
+  white-space: nowrap;
 }
 
 .absent-wrap {
