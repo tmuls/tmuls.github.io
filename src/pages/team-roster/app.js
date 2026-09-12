@@ -10,8 +10,9 @@
   const shareBtn = document.getElementById("share-btn");
   const resetBtn = document.getElementById("reset-btn");
 
-  /** @type {{ id: string, name: string, bench: boolean }[]} */
+  /** @type {{ id: string, name: string, bench: boolean, number: number }[]} */
   let players = [];
+  let editingNumberId = null;
 
   // ---------- base64 helpers (UTF-8 safe) ----------
 
@@ -42,13 +43,35 @@
 
   function sanitize(raw) {
     if (!Array.isArray(raw)) return [];
-    return raw
+    const list = raw
       .filter((p) => p && typeof p.name === "string")
       .map((p) => ({
         id: typeof p.id === "string" ? p.id : makeId(),
         name: p.name,
         bench: p.bench !== false,
+        number: Number.isInteger(p.number) && p.number > 0 ? p.number : null,
       }));
+    assignMissingNumbers(list);
+    return list;
+  }
+
+  function assignMissingNumbers(list) {
+    const used = new Set(list.filter((p) => p.number !== null).map((p) => p.number));
+    let next = 1;
+    for (const p of list) {
+      if (p.number === null) {
+        while (used.has(next)) next++;
+        p.number = next;
+        used.add(next);
+      }
+    }
+  }
+
+  function nextAvailableNumber() {
+    const used = new Set(players.map((p) => p.number));
+    let n = 1;
+    while (used.has(n)) n++;
+    return n;
   }
 
   function loadInitialState() {
@@ -95,7 +118,20 @@
   }
 
   function addPlayer(name) {
-    players.push({ id: makeId(), name: name.trim(), bench: true });
+    players.push({ id: makeId(), name: name.trim(), bench: true, number: nextAvailableNumber() });
+    render();
+    persistState();
+  }
+
+  function setPlayerNumber(id, rawValue) {
+    const player = players.find((p) => p.id === id);
+    if (player) {
+      const parsed = parseInt(rawValue, 10);
+      if (Number.isInteger(parsed) && parsed > 0) {
+        player.number = parsed;
+      }
+    }
+    editingNumberId = null;
     render();
     persistState();
   }
@@ -147,6 +183,14 @@
     } else {
       bench.forEach((player) => listEl.appendChild(createRow(player)));
     }
+
+    if (editingNumberId) {
+      const input = listEl.querySelector(".player-number-input");
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
   }
 
   function sectionLabel(text) {
@@ -183,6 +227,35 @@
     return el;
   }
 
+  function createNumberEl(player) {
+    if (editingNumberId === player.id) {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "1";
+      input.className = "player-number-input";
+      input.value = player.number;
+      input.addEventListener("pointerdown", (e) => e.stopPropagation());
+      input.addEventListener("click", (e) => e.stopPropagation());
+      input.addEventListener("blur", () => setPlayerNumber(player.id, input.value));
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") input.blur();
+      });
+      return input;
+    }
+
+    const badge = document.createElement("span");
+    badge.className = "player-number";
+    badge.textContent = `#${player.number}`;
+    badge.title = "Click to change number";
+    badge.addEventListener("pointerdown", (e) => e.stopPropagation());
+    badge.addEventListener("click", (e) => {
+      e.stopPropagation();
+      editingNumberId = player.id;
+      render();
+    });
+    return badge;
+  }
+
   function createRow(player) {
     const row = document.createElement("div");
     row.className = "player-row";
@@ -192,6 +265,8 @@
     handle.className = "drag-handle";
     handle.textContent = "⋮⋮";
     row.appendChild(handle);
+
+    row.appendChild(createNumberEl(player));
 
     const label = document.createElement("span");
     label.className = "player-name";
