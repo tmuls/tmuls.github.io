@@ -2,7 +2,6 @@
   color-scheme: light dark;
   --bg: #0f172a;
   --panel: #1e293b;
-  --panel-alt: #16213a;
   --text: #f1f5f9;
   --muted: #94a3b8;
   --accent: #22c55e;
@@ -82,140 +81,122 @@ button {
 }
 
 .board {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
-.roster-panel {
-  flex: 3 1 480px;
-}
-
-.bench-panel {
-  flex: 1 1 220px;
-  min-width: 220px;
-}
-
-h2 {
-  font-size: 1rem;
-  color: var(--muted);
-  margin: 0 0 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.roster-field {
-  position: relative;
-  width: 100%;
-  min-height: 480px;
-  border-radius: 12px;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.03) 0px,
-      rgba(255, 255, 255, 0.03) 2px,
-      transparent 2px,
-      transparent 48px
-    ),
-    linear-gradient(160deg, #14532d, #166534 45%, #15803d 100%);
-  border: 2px solid #14532d;
-  overflow: hidden;
-  touch-action: none;
-}
-
-.roster-field::before {
-  content: "";
-  position: absolute;
-  inset: 6%;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  pointer-events: none;
-}
-
-.roster-field::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 6%;
-  right: 6%;
-  height: 0;
-  border-top: 2px solid rgba(255, 255, 255, 0.25);
-  pointer-events: none;
-}
-
-.bench-list {
+.player-list {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  min-height: 200px;
-  padding: 10px;
-  border-radius: 12px;
-  background: var(--panel-alt);
-  border: 2px dashed var(--border);
-  touch-action: none;
-}
-
-.bench-list.drag-over,
-.roster-field.drag-over {
-  border-color: var(--accent);
-}
-
-.bench-empty {
-  color: var(--muted);
-  font-size: 0.85rem;
-  text-align: center;
-  padding: 24px 8px;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
   gap: 6px;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 4px 2px 2px;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
   background: var(--chip);
   color: var(--chip-text);
-  border-radius: 999px;
-  padding: 6px 8px 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   cursor: grab;
   user-select: none;
-  white-space: nowrap;
   touch-action: none;
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
 }
 
-.chip:active {
+.player-row:active {
   cursor: grabbing;
 }
 
-.roster-field .chip {
-  position: absolute;
-  transform: translate(-50%, -50%);
-}
-
-.chip.dragging {
+.player-row.dragging {
   opacity: 0.35;
 }
 
-.chip .remove-btn {
+.drag-handle {
+  flex: 0 0 auto;
+  color: #94a3b8;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.player-name {
+  flex: 1 1 auto;
+  font-weight: 600;
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-btn {
+  flex: 0 0 auto;
   border: none;
   background: var(--danger);
   color: white;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   line-height: 1;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.divider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.divider-line {
+  flex: 1 1 auto;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+.divider-label {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.empty-row {
+  padding: 16px 12px;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.drop-indicator {
+  height: 3px;
+  margin: 2px 0;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
 }
 
 .drag-ghost {
@@ -230,20 +211,6 @@ h2 {
 .hint {
   color: var(--muted);
   font-size: 0.8rem;
-  max-width: 720px;
-  margin-top: 16px;
-}
-
-@media (max-width: 720px) {
-  .board {
-    flex-direction: column;
-  }
-  .roster-panel,
-  .bench-panel {
-    flex: 1 1 auto;
-    width: 100%;
-  }
-  .roster-field {
-    min-height: 380px;
-  }
+  max-width: 640px;
+  margin: 16px auto 0;
 }

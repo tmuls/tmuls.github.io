@@ -4,14 +4,13 @@
   const STORAGE_KEY = "teamRosterData";
   const URL_PARAM = "data";
 
-  const rosterField = document.getElementById("roster-field");
-  const benchList = document.getElementById("bench-list");
+  const listEl = document.getElementById("player-list");
   const addForm = document.getElementById("add-form");
   const nameInput = document.getElementById("player-name");
   const shareBtn = document.getElementById("share-btn");
   const resetBtn = document.getElementById("reset-btn");
 
-  /** @type {{ id: string, name: string, bench: boolean, x: number, y: number }[]} */
+  /** @type {{ id: string, name: string, bench: boolean }[]} */
   let players = [];
 
   // ---------- base64 helpers (UTF-8 safe) ----------
@@ -41,13 +40,24 @@
 
   // ---------- persistence ----------
 
+  function sanitize(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .filter((p) => p && typeof p.name === "string")
+      .map((p) => ({
+        id: typeof p.id === "string" ? p.id : makeId(),
+        name: p.name,
+        bench: p.bench !== false,
+      }));
+  }
+
   function loadInitialState() {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get(URL_PARAM);
 
     if (fromUrl) {
       try {
-        return decodeState(fromUrl);
+        return sanitize(decodeState(fromUrl));
       } catch (err) {
         console.warn("Could not decode roster data from URL, falling back.", err);
       }
@@ -56,7 +66,7 @@
     const fromStorage = localStorage.getItem(STORAGE_KEY);
     if (fromStorage) {
       try {
-        return decodeState(fromStorage);
+        return sanitize(decodeState(fromStorage));
       } catch (err) {
         console.warn("Could not decode roster data from localStorage.", err);
       }
@@ -85,13 +95,7 @@
   }
 
   function addPlayer(name) {
-    players.push({
-      id: makeId(),
-      name: name.trim(),
-      bench: true,
-      x: 50,
-      y: 50,
-    });
+    players.push({ id: makeId(), name: name.trim(), bench: true });
     render();
     persistState();
   }
@@ -102,73 +106,97 @@
     persistState();
   }
 
-  function movePlayerToRoster(id, x, y) {
-    const player = players.find((p) => p.id === id);
-    if (!player) return;
-    player.bench = false;
-    player.x = clamp(x, 3, 97);
-    player.y = clamp(y, 3, 97);
-    render();
-    persistState();
-  }
+  function movePlayer(id, bench, index) {
+    const dragged = players.find((p) => p.id === id);
+    if (!dragged) return;
 
-  function movePlayerToBench(id, beforeId) {
-    const idx = players.findIndex((p) => p.id === id);
-    if (idx === -1) return;
-    const [player] = players.splice(idx, 1);
-    player.bench = true;
+    const activeList = players.filter((p) => !p.bench && p.id !== id);
+    const benchList = players.filter((p) => p.bench && p.id !== id);
 
-    if (beforeId) {
-      const targetIdx = players.findIndex((p) => p.id === beforeId);
-      players.splice(targetIdx === -1 ? players.length : targetIdx, 0, player);
+    dragged.bench = bench;
+    if (bench) {
+      benchList.splice(index, 0, dragged);
     } else {
-      players.push(player);
+      activeList.splice(index, 0, dragged);
     }
 
+    players = [...activeList, ...benchList];
     render();
     persistState();
-  }
-
-  function clamp(n, min, max) {
-    return Math.min(max, Math.max(min, n));
   }
 
   // ---------- rendering ----------
 
   function render() {
-    rosterField.querySelectorAll(".chip").forEach((el) => el.remove());
-    benchList.querySelectorAll(".chip, .bench-empty").forEach((el) => el.remove());
+    listEl.innerHTML = "";
 
-    const rosterPlayers = players.filter((p) => !p.bench);
-    const benchPlayers = players.filter((p) => p.bench);
+    const active = players.filter((p) => !p.bench);
+    const bench = players.filter((p) => p.bench);
 
-    rosterPlayers.forEach((player) => {
-      const chip = createChip(player);
-      chip.style.left = `${player.x}%`;
-      chip.style.top = `${player.y}%`;
-      rosterField.appendChild(chip);
-    });
-
-    if (benchPlayers.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "bench-empty";
-      empty.textContent = "No players on the bench.";
-      benchList.appendChild(empty);
+    listEl.appendChild(sectionLabel("Active Roster"));
+    if (active.length === 0) {
+      listEl.appendChild(emptyRow("No active players. Drag a player above the line to activate them."));
     } else {
-      benchPlayers.forEach((player) => {
-        benchList.appendChild(createChip(player));
-      });
+      active.forEach((player) => listEl.appendChild(createRow(player)));
+    }
+
+    listEl.appendChild(createDivider());
+
+    if (bench.length === 0) {
+      listEl.appendChild(emptyRow("No players on the bench."));
+    } else {
+      bench.forEach((player) => listEl.appendChild(createRow(player)));
     }
   }
 
-  function createChip(player) {
-    const chip = document.createElement("div");
-    chip.className = "chip";
-    chip.dataset.id = player.id;
+  function sectionLabel(text) {
+    const el = document.createElement("div");
+    el.className = "section-label";
+    el.textContent = text;
+    return el;
+  }
+
+  function createDivider() {
+    const el = document.createElement("div");
+    el.className = "divider-row";
+
+    const lineLeft = document.createElement("span");
+    lineLeft.className = "divider-line";
+    el.appendChild(lineLeft);
 
     const label = document.createElement("span");
+    label.className = "divider-label";
+    label.textContent = "Bench";
+    el.appendChild(label);
+
+    const lineRight = document.createElement("span");
+    lineRight.className = "divider-line";
+    el.appendChild(lineRight);
+
+    return el;
+  }
+
+  function emptyRow(text) {
+    const el = document.createElement("div");
+    el.className = "empty-row";
+    el.textContent = text;
+    return el;
+  }
+
+  function createRow(player) {
+    const row = document.createElement("div");
+    row.className = "player-row";
+    row.dataset.id = player.id;
+
+    const handle = document.createElement("span");
+    handle.className = "drag-handle";
+    handle.textContent = "⋮⋮";
+    row.appendChild(handle);
+
+    const label = document.createElement("span");
+    label.className = "player-name";
     label.textContent = player.name;
-    chip.appendChild(label);
+    row.appendChild(label);
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
@@ -180,38 +208,55 @@
       e.stopPropagation();
       removePlayer(player.id);
     });
-    chip.appendChild(removeBtn);
+    row.appendChild(removeBtn);
 
-    chip.addEventListener("pointerdown", onChipPointerDown);
+    row.addEventListener("pointerdown", onRowPointerDown);
 
-    return chip;
+    return row;
   }
 
   // ---------- drag interaction (pointer events, works for mouse & touch) ----------
 
   let drag = null;
 
-  function onChipPointerDown(e) {
-    if (e.button !== undefined && e.button !== 0 && e.pointerType === "mouse") return;
+  function onRowPointerDown(e) {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
 
-    const chip = e.currentTarget;
-    const id = chip.dataset.id;
-    const rect = chip.getBoundingClientRect();
+    const row = e.currentTarget;
+    const id = row.dataset.id;
+    const rect = row.getBoundingClientRect();
 
-    const ghost = chip.cloneNode(true);
+    const others = [];
+    for (const el of listEl.children) {
+      if (el === row) continue;
+      if (el.classList.contains("player-row")) {
+        const player = players.find((p) => p.id === el.dataset.id);
+        others.push({ type: "player", bench: player ? player.bench : true, el, rect: el.getBoundingClientRect() });
+      } else if (el.classList.contains("divider-row")) {
+        others.push({ type: "divider", el, rect: el.getBoundingClientRect() });
+      }
+    }
+
+    const ghost = row.cloneNode(true);
     ghost.classList.add("drag-ghost");
     ghost.style.width = `${rect.width}px`;
     document.body.appendChild(ghost);
+
+    const indicator = document.createElement("div");
+    indicator.className = "drop-indicator";
 
     drag = {
       id,
       offsetX: e.clientX - rect.left,
       offsetY: e.clientY - rect.top,
       ghost,
-      originEl: chip,
+      indicator,
+      originEl: row,
+      others,
+      lastIndex: null,
     };
 
-    chip.classList.add("dragging");
+    row.classList.add("dragging");
     positionGhost(e.clientX, e.clientY);
 
     window.addEventListener("pointermove", onDragMove);
@@ -220,59 +265,63 @@
   }
 
   function positionGhost(clientX, clientY) {
-    if (!drag) return;
     drag.ghost.style.left = `${clientX - drag.offsetX}px`;
     drag.ghost.style.top = `${clientY - drag.offsetY}px`;
+  }
+
+  function computeInsertionIndex(clientY) {
+    const { others } = drag;
+    for (let i = 0; i < others.length; i++) {
+      const mid = others[i].rect.top + others[i].rect.height / 2;
+      if (clientY < mid) return i;
+    }
+    return others.length;
+  }
+
+  function updateIndicator(index) {
+    const { others, indicator } = drag;
+    if (index >= others.length) {
+      listEl.appendChild(indicator);
+    } else {
+      listEl.insertBefore(indicator, others[index].el);
+    }
   }
 
   function onDragMove(e) {
     if (!drag) return;
     positionGhost(e.clientX, e.clientY);
 
-    rosterField.classList.remove("drag-over");
-    benchList.classList.remove("drag-over");
-
-    const target = elementUnderGhost(e.clientX, e.clientY);
-    if (target === rosterField || rosterField.contains(target)) {
-      rosterField.classList.add("drag-over");
-    } else if (target === benchList || benchList.contains(target)) {
-      benchList.classList.add("drag-over");
+    const index = computeInsertionIndex(e.clientY);
+    if (index !== drag.lastIndex) {
+      drag.lastIndex = index;
+      updateIndicator(index);
     }
-  }
-
-  function elementUnderGhost(clientX, clientY) {
-    drag.ghost.style.visibility = "hidden";
-    const el = document.elementFromPoint(clientX, clientY);
-    drag.ghost.style.visibility = "visible";
-    return el;
   }
 
   function onDragEnd(e) {
     if (!drag) return;
-    const { id, ghost, originEl } = drag;
+    const { id, ghost, indicator, others } = drag;
 
-    const target = elementUnderGhost(e.clientX, e.clientY);
-    const droppedOnRoster = target === rosterField || rosterField.contains(target);
-    const droppedOnBench = target === benchList || benchList.contains(target);
+    const index = drag.lastIndex !== null ? drag.lastIndex : computeInsertionIndex(e.clientY);
+    const dividerPos = others.findIndex((o) => o.type === "divider");
 
-    if (droppedOnRoster) {
-      const rect = rosterField.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      movePlayerToRoster(id, x, y);
-    } else if (droppedOnBench) {
-      const beforeChip = target.closest ? target.closest(".chip") : null;
-      movePlayerToBench(id, beforeChip && beforeChip.dataset.id !== id ? beforeChip.dataset.id : null);
+    let bench;
+    let targetIndex;
+    if (dividerPos === -1 || index <= dividerPos) {
+      bench = false;
+      targetIndex = index;
     } else {
-      originEl.classList.remove("dragging");
+      bench = true;
+      targetIndex = index - dividerPos - 1;
     }
 
     ghost.remove();
-    rosterField.classList.remove("drag-over");
-    benchList.classList.remove("drag-over");
+    indicator.remove();
     window.removeEventListener("pointermove", onDragMove);
     window.removeEventListener("pointerup", onDragEnd);
     drag = null;
+
+    movePlayer(id, bench, targetIndex);
   }
 
   // ---------- misc UI ----------
