@@ -212,18 +212,48 @@
     const absent = players.filter((p) => p.absent);
     if (present.length < 2) return;
 
-    // Forward = standard volleyball clockwise rotation (2->1->6->5->4->3->2)
-    // when exactly 6 are present; with more present, it also rotates the
-    // next bench player onto the court.
-    if (direction === "forward") {
-      present.unshift(present.pop());
-    } else {
-      present.push(present.shift());
-    }
-
-    players = [...present, ...absent];
+    players = [...rotatePresentQueue(present, direction), ...absent];
     render();
     persistState();
+  }
+
+  function rotatePresentQueue(present, direction) {
+    const n = present.length;
+
+    if (n <= COURT_SIZE) {
+      // No bench to substitute from: pure positional reshuffle, nobody
+      // exits. Forward = standard clockwise serve rotation (2->1->6->5->4->3->2).
+      const queue = present.slice();
+      if (direction === "forward") {
+        queue.unshift(queue.pop());
+      } else {
+        queue.push(queue.shift());
+      }
+      return queue;
+    }
+
+    // With a bench present, the server (position 1) is the one who exits —
+    // rotating out to the back of the bench line — while the front of the
+    // bench subs in at position 6, and the rest of the on-court group shifts
+    // by the usual clockwise serve rotation.
+    if (direction === "forward") {
+      return [
+        present[COURT_SIZE - 1],
+        present[COURT_SIZE],
+        ...present.slice(1, COURT_SIZE - 1),
+        ...present.slice(COURT_SIZE + 1),
+        present[0],
+      ];
+    }
+
+    // Exact inverse of the forward branch above.
+    return [
+      present[n - 1],
+      ...present.slice(2, COURT_SIZE),
+      present[0],
+      present[1],
+      ...present.slice(COURT_SIZE, n - 1),
+    ];
   }
 
   // ---------- rendering ----------
