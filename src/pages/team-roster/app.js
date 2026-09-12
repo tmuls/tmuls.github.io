@@ -275,6 +275,16 @@
     const newPositions = new Map();
     newCourt.forEach((player, index) => newPositions.set(player.id, index));
 
+    // Snapshot every cell's true resting rect up front, before any
+    // .animate() call runs. Cells are reused across renders (unlike roster
+    // rows, which are rebuilt fresh each time), so reading
+    // getBoundingClientRect() mid-loop after an earlier iteration already
+    // started animating that same cell would return its current transformed
+    // position instead of its static grid slot — corrupting the delta for
+    // whichever other player's old or new cell happens to be that position.
+    const cellRects = [];
+    for (let i = 0; i < COURT_SIZE; i++) cellRects[i] = courtCellAt(i).getBoundingClientRect();
+
     newPositions.forEach((newIndex, id) => {
       const cell = courtCellAt(newIndex);
       const oldIndex = oldPositions.get(id);
@@ -287,8 +297,8 @@
           easing: "ease-in-out",
         });
       } else if (oldIndex !== newIndex) {
-        const dx = courtCellAt(oldIndex).getBoundingClientRect().left - cell.getBoundingClientRect().left;
-        const dy = courtCellAt(oldIndex).getBoundingClientRect().top - cell.getBoundingClientRect().top;
+        const dx = cellRects[oldIndex].left - cellRects[newIndex].left;
+        const dy = cellRects[oldIndex].top - cellRects[newIndex].top;
         cell.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0, 0)" }], {
           duration: 350,
           easing: "ease-in-out",
@@ -302,14 +312,12 @@
     // bottom instead of just vanishing.
     oldPositions.forEach((oldIndex, id) => {
       if (!newPositions.has(id)) {
-        animateCourtExit(oldIndex, oldData.get(id));
+        animateCourtExit(cellRects[oldIndex], oldData.get(id));
       }
     });
   }
 
-  function animateCourtExit(oldIndex, player) {
-    const cell = courtCellAt(oldIndex);
-    const cellRect = cell.getBoundingClientRect();
+  function animateCourtExit(cellRect, player) {
     const courtRect = courtEl.getBoundingClientRect();
 
     const ghost = document.createElement("div");
