@@ -75,9 +75,36 @@ button {
   background: var(--accent-dark);
 }
 
+.add-form input:disabled,
+.add-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .header-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+#lock-btn.locked {
+  background: var(--danger);
+  border-color: #b91c1c;
+  color: white;
+  font-weight: 600;
+}
+
+.locked-banner {
+  max-width: 640px;
+  margin: 0 auto 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--danger);
+  color: #fecaca;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .board {
@@ -124,6 +151,18 @@ button {
   opacity: 0.35;
 }
 
+.player-row.locked {
+  cursor: default;
+}
+
+.player-row.locked:active {
+  cursor: default;
+}
+
+.player-row.locked .drag-handle {
+  opacity: 0.25;
+}
+
 .drag-handle {
   flex: 0 0 auto;
   color: #94a3b8;
@@ -133,25 +172,44 @@ button {
 }
 
 .player-number {
+  position: relative;
   flex: 0 0 auto;
-  min-width: 28px;
-  height: 28px;
-  padding: 0 4px;
-  border-radius: 50%;
-  background: var(--accent-dark);
-  color: white;
-  font-weight: 700;
-  font-size: 0.8rem;
+  width: 30px;
+  height: 34px;
+  border-radius: 6px;
+  background: #0b1220;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  overflow: hidden;
+}
+
+.player-number.locked {
+  cursor: default;
+}
+
+.jersey-icon {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  fill: #d1d5db;
+}
+
+.jersey-number {
+  position: relative;
+  z-index: 1;
+  color: #0b1220;
+  font-weight: 800;
+  font-size: 0.7rem;
+  line-height: 1;
 }
 
 .player-number-input {
   flex: 0 0 auto;
   width: 48px;
-  height: 28px;
+  height: 34px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: white;
@@ -185,6 +243,11 @@ button {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.remove-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .divider-row {

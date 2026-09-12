@@ -3,15 +3,21 @@
 
   const STORAGE_KEY = "teamRosterData";
   const URL_PARAM = "data";
+  const COURT_SIZE = 6;
 
   const listEl = document.getElementById("player-list");
   const addForm = document.getElementById("add-form");
   const nameInput = document.getElementById("player-name");
+  const rotateBackBtn = document.getElementById("rotate-back-btn");
+  const rotateForwardBtn = document.getElementById("rotate-forward-btn");
+  const lockBtn = document.getElementById("lock-btn");
+  const lockedBanner = document.getElementById("locked-banner");
   const shareBtn = document.getElementById("share-btn");
   const resetBtn = document.getElementById("reset-btn");
 
   /** @type {{ id: string, name: string, bench: boolean, number: number }[]} */
   let players = [];
+  let locked = false;
   let editingNumberId = null;
 
   // ---------- base64 helpers (UTF-8 safe) ----------
@@ -41,7 +47,7 @@
 
   // ---------- persistence ----------
 
-  function sanitize(raw) {
+  function sanitizePlayers(raw) {
     if (!Array.isArray(raw)) return [];
     const list = raw
       .filter((p) => p && typeof p.name === "string")
@@ -80,7 +86,7 @@
 
     if (fromUrl) {
       try {
-        return sanitize(decodeState(fromUrl));
+        return sanitizeState(decodeState(fromUrl));
       } catch (err) {
         console.warn("Could not decode roster data from URL, falling back.", err);
       }
@@ -89,17 +95,27 @@
     const fromStorage = localStorage.getItem(STORAGE_KEY);
     if (fromStorage) {
       try {
-        return sanitize(decodeState(fromStorage));
+        return sanitizeState(decodeState(fromStorage));
       } catch (err) {
         console.warn("Could not decode roster data from localStorage.", err);
       }
     }
 
-    return [];
+    return { players: [], locked: false };
+  }
+
+  function sanitizeState(raw) {
+    if (Array.isArray(raw)) {
+      return { players: sanitizePlayers(raw), locked: false };
+    }
+    if (raw && typeof raw === "object") {
+      return { players: sanitizePlayers(raw.players), locked: raw.locked === true };
+    }
+    return { players: [], locked: false };
   }
 
   function persistState() {
-    const encoded = encodeState(players);
+    const encoded = encodeState({ players, locked });
     localStorage.setItem(STORAGE_KEY, encoded);
 
     const url = new URL(window.location.href);
@@ -118,17 +134,20 @@
   }
 
   function addPlayer(name) {
+    if (locked) return;
     players.push({ id: makeId(), name: name.trim(), bench: true, number: nextAvailableNumber() });
     render();
     persistState();
   }
 
   function setPlayerNumber(id, rawValue) {
-    const player = players.find((p) => p.id === id);
-    if (player) {
-      const parsed = parseInt(rawValue, 10);
-      if (Number.isInteger(parsed) && parsed > 0) {
-        player.number = parsed;
+    if (!locked) {
+      const player = players.find((p) => p.id === id);
+      if (player) {
+        const parsed = parseInt(rawValue, 10);
+        if (Number.isInteger(parsed) && parsed > 0) {
+          player.number = parsed;
+        }
       }
     }
     editingNumberId = null;
@@ -137,12 +156,14 @@
   }
 
   function removePlayer(id) {
+    if (locked) return;
     players = players.filter((p) => p.id !== id);
     render();
     persistState();
   }
 
   function movePlayer(id, bench, index) {
+    if (locked) return;
     const dragged = players.find((p) => p.id === id);
     if (!dragged) return;
 
@@ -161,6 +182,22 @@
     persistState();
   }
 
+  function rotateCourt(direction) {
+    const active = players.filter((p) => !p.bench);
+    const bench = players.filter((p) => p.bench);
+    if (active.length < 2) return;
+
+    if (direction === "forward") {
+      active.push(active.shift());
+    } else {
+      active.unshift(active.pop());
+    }
+
+    players = [...active, ...bench];
+    render();
+    persistState();
+  }
+
   // ---------- rendering ----------
 
   function render() {
@@ -169,9 +206,15 @@
     const active = players.filter((p) => !p.bench);
     const bench = players.filter((p) => p.bench);
 
-    listEl.appendChild(sectionLabel("Active Roster"));
+    lockedBanner.hidden = !locked;
+    lockBtn.textContent = locked ? "🔓 Unlock Roster" : "🔒 Lock Roster";
+    lockBtn.classList.toggle("locked", locked);
+    nameInput.disabled = locked;
+    addForm.querySelector("button[type=submit]").disabled = locked;
+
+    listEl.appendChild(sectionLabel(`On Court (${active.length}/${COURT_SIZE})`));
     if (active.length === 0) {
-      listEl.appendChild(emptyRow("No active players. Drag a player above the line to activate them."));
+      listEl.appendChild(emptyRow("No players on the court. Drag a player above the line to send them in."));
     } else {
       active.forEach((player) => listEl.appendChild(createRow(player)));
     }
@@ -227,8 +270,11 @@
     return el;
   }
 
+  const JERSEY_SVG_PATH =
+    "M8 2 L10 2 L12 4 L14 2 L16 2 L20 5 L18 8 L16 7 L16 20 L8 20 L8 7 L6 8 L4 5 Z";
+
   function createNumberEl(player) {
-    if (editingNumberId === player.id) {
+    if (!locked && editingNumberId === player.id) {
       const input = document.createElement("input");
       input.type = "number";
       input.min = "1";
@@ -245,20 +291,30 @@
 
     const badge = document.createElement("span");
     badge.className = "player-number";
-    badge.textContent = `#${player.number}`;
-    badge.title = "Click to change number";
-    badge.addEventListener("pointerdown", (e) => e.stopPropagation());
-    badge.addEventListener("click", (e) => {
-      e.stopPropagation();
-      editingNumberId = player.id;
-      render();
-    });
+    badge.classList.toggle("locked", locked);
+    badge.innerHTML = `
+      <svg class="jersey-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="${JERSEY_SVG_PATH}"></path>
+      </svg>
+      <span class="jersey-number">${player.number}</span>
+    `;
+
+    if (!locked) {
+      badge.title = "Tap to change number";
+      badge.addEventListener("pointerdown", (e) => e.stopPropagation());
+      badge.addEventListener("click", (e) => {
+        e.stopPropagation();
+        editingNumberId = player.id;
+        render();
+      });
+    }
     return badge;
   }
 
   function createRow(player) {
     const row = document.createElement("div");
     row.className = "player-row";
+    row.classList.toggle("locked", locked);
     row.dataset.id = player.id;
 
     const handle = document.createElement("span");
@@ -278,6 +334,7 @@
     removeBtn.className = "remove-btn";
     removeBtn.textContent = "×";
     removeBtn.title = "Remove player";
+    removeBtn.disabled = locked;
     removeBtn.addEventListener("pointerdown", (e) => e.stopPropagation());
     removeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -295,6 +352,7 @@
   let drag = null;
 
   function onRowPointerDown(e) {
+    if (locked) return;
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
     const row = e.currentTarget;
@@ -403,11 +461,22 @@
 
   addForm.addEventListener("submit", (e) => {
     e.preventDefault();
+    if (locked) return;
     const name = nameInput.value.trim();
     if (!name) return;
     addPlayer(name);
     nameInput.value = "";
     nameInput.focus();
+  });
+
+  rotateBackBtn.addEventListener("click", () => rotateCourt("backward"));
+  rotateForwardBtn.addEventListener("click", () => rotateCourt("forward"));
+
+  lockBtn.addEventListener("click", () => {
+    locked = !locked;
+    editingNumberId = null;
+    render();
+    persistState();
   });
 
   shareBtn.addEventListener("click", async () => {
@@ -423,6 +492,7 @@
   });
 
   resetBtn.addEventListener("click", () => {
+    if (locked) return;
     if (players.length === 0) return;
     if (!confirm("Remove all players from the roster and bench?")) return;
     players = [];
@@ -432,7 +502,9 @@
 
   // ---------- init ----------
 
-  players = loadInitialState();
+  const initial = loadInitialState();
+  players = initial.players;
+  locked = initial.locked;
   render();
   persistState();
 })();
