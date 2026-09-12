@@ -14,8 +14,6 @@
       <button type="submit">Add Player</button>
     </form>
     <div class="header-actions">
-      <button id="rotate-back-btn" type="button" title="Rotate the court order backward">⟲ Rotate Back</button>
-      <button id="rotate-forward-btn" type="button" title="Rotate the court order forward">Rotate Forward ⟳</button>
       <button id="lock-btn" type="button" title="Lock or unlock roster changes">🔒 Lock Roster</button>
       <button id="share-btn" type="button" title="Copy a shareable link with the current roster">Copy Share Link</button>
       <button id="reset-btn" type="button" title="Remove all players">Reset</button>
@@ -34,6 +32,20 @@
         <div class="court-cell" data-pos="5"></div>
         <div class="court-cell" data-pos="6"></div>
         <div class="court-cell" data-pos="1"></div>
+      </div>
+      <div class="court-controls">
+        <button id="rotate-back-btn" class="court-rotate-btn" type="button" title="Rotate the lineup backward">
+          <svg class="rotate-icon flip" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12A9 9 0 1 1 12 3" />
+            <polyline points="12 3 16 3 16 7" />
+          </svg>
+        </button>
+        <button id="rotate-forward-btn" class="court-rotate-btn" type="button" title="Rotate the lineup forward">
+          <svg class="rotate-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12A9 9 0 1 1 12 3" />
+            <polyline points="12 3 16 3 16 7" />
+          </svg>
+        </button>
       </div>
     </div>
   </div>
