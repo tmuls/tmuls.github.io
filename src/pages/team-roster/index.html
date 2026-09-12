@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Team Roster</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Team Roster</h1>
+    <form id="add-form" class="add-form">
+      <input type="text" id="player-name" placeholder="Player name" maxlength="40" required />
+      <button type="submit">Add Player</button>
+    </form>
+    <div class="header-actions">
+      <button id="share-btn" type="button" title="Copy a shareable link with the current roster">Copy Share Link</button>
+      <button id="reset-btn" type="button" title="Remove all players">Reset</button>
+    </div>
+  </header>
+
+  <main class="board">
+    <section class="roster-panel">
+      <h2>Roster</h2>
+      <div id="roster-field" class="roster-field"></div>
+    </section>
+    <section class="bench-panel">
+      <h2>Bench</h2>
+      <div id="bench-list" class="bench-list"></div>
+    </section>
+  </main>
+
+  <p class="hint">Drag a player chip anywhere on the field, or drag it onto the bench to substitute. Everything is saved to your browser and encoded into the page URL so you can share or bookmark your roster.</p>
+
+  <script src="app.js"></script>
+</body>
+</html>
