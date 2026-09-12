@@ -224,6 +224,17 @@ button {
   text-align: center;
 }
 
+/* A short-lived stand-in for the player rotating out: the real cell at
+   their old position already shows the replacement, so this floats above
+   it (absolutely positioned over that same spot) just long enough to
+   animate out the bottom before removing itself. */
+.court-exit-ghost {
+  position: absolute;
+  z-index: 5;
+  background: var(--panel);
+  pointer-events: none;
+}
+
 .court-pos-num {
   position: absolute;
   top: 4px;

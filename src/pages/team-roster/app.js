@@ -225,6 +225,7 @@
     // animation than the plain one-slot shift everyone else does.
     const jumpingId = direction === "forward" ? present[0].id : present[present.length - 1].id;
     const oldRects = capturePlayerRowRects();
+    const oldCourt = captureCourtSnapshot();
 
     if (direction === "forward") {
       present.push(present.shift());
@@ -236,6 +237,11 @@
     render();
     persistState();
     animateRowMoves(oldRects, jumpingId);
+    animateCourtRotation(oldCourt);
+  }
+
+  function prefersReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
   function capturePlayerRowRects() {
@@ -246,8 +252,94 @@
     return rects;
   }
 
+  function captureCourtSnapshot() {
+    const court = players.filter((p) => !p.absent).slice(0, COURT_SIZE);
+    const positions = new Map();
+    const data = new Map();
+    court.forEach((player, index) => {
+      positions.set(player.id, index);
+      data.set(player.id, { name: player.name, number: player.number });
+    });
+    return { positions, data };
+  }
+
+  function courtCellAt(index) {
+    return courtEl.querySelector(`.court-cell[data-pos="${index + 1}"]`);
+  }
+
+  function animateCourtRotation(oldCourt) {
+    if (prefersReducedMotion()) return;
+    const { positions: oldPositions, data: oldData } = oldCourt;
+
+    const newCourt = players.filter((p) => !p.absent).slice(0, COURT_SIZE);
+    const newPositions = new Map();
+    newCourt.forEach((player, index) => newPositions.set(player.id, index));
+
+    newPositions.forEach((newIndex, id) => {
+      const cell = courtCellAt(newIndex);
+      const oldIndex = oldPositions.get(id);
+
+      if (oldIndex === undefined) {
+        // Subbing in from the bench: no previous cell to slide from, so
+        // come in from below the court and fade into view.
+        cell.animate([{ transform: "translateY(50px)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], {
+          duration: 400,
+          easing: "ease-in-out",
+        });
+      } else if (oldIndex !== newIndex) {
+        const dx = courtCellAt(oldIndex).getBoundingClientRect().left - cell.getBoundingClientRect().left;
+        const dy = courtCellAt(oldIndex).getBoundingClientRect().top - cell.getBoundingClientRect().top;
+        cell.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0, 0)" }], {
+          duration: 350,
+          easing: "ease-in-out",
+        });
+      }
+    });
+
+    // The player rotating out no longer has a cell to animate — the real
+    // cell at their old position already shows whoever replaced them — so
+    // float a temporary look-alike over that spot and send it out the
+    // bottom instead of just vanishing.
+    oldPositions.forEach((oldIndex, id) => {
+      if (!newPositions.has(id)) {
+        animateCourtExit(oldIndex, oldData.get(id));
+      }
+    });
+  }
+
+  function animateCourtExit(oldIndex, player) {
+    const cell = courtCellAt(oldIndex);
+    const cellRect = cell.getBoundingClientRect();
+    const courtRect = courtEl.getBoundingClientRect();
+
+    const ghost = document.createElement("div");
+    ghost.className = "court-cell court-exit-ghost";
+    ghost.style.left = `${cellRect.left - courtRect.left}px`;
+    ghost.style.top = `${cellRect.top - courtRect.top}px`;
+    ghost.style.width = `${cellRect.width}px`;
+    ghost.style.height = `${cellRect.height}px`;
+
+    const name = document.createElement("span");
+    name.className = "court-player-name";
+    name.textContent = player.name;
+    ghost.appendChild(name);
+
+    const jersey = document.createElement("span");
+    jersey.className = "court-player-jersey";
+    jersey.textContent = `#${player.number}`;
+    ghost.appendChild(jersey);
+
+    courtEl.appendChild(ghost);
+
+    const animation = ghost.animate(
+      [{ transform: "translateY(0)", opacity: 1 }, { transform: "translateY(50px)", opacity: 0 }],
+      { duration: 400, easing: "ease-in-out" }
+    );
+    animation.onfinish = () => ghost.remove();
+  }
+
   function animateRowMoves(oldRects, jumpingId) {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
 
     boardEl.querySelectorAll(".player-row").forEach((row) => {
       const oldRect = oldRects.get(row.dataset.id);
