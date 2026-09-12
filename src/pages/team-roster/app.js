@@ -10,9 +10,11 @@
   // = on court). Absent players are a separate pool, excluded from rotation.
   const STATUS_ORDER = ["present", "absent"];
 
-  // On-court list index -> volleyball court position, walking the standard
-  // clockwise rotation order (server at position 1, back row, then around).
-  const COURT_POSITIONS = [1, 6, 5, 4, 3, 2];
+  // Present players are stored in plain sequential court-position order:
+  // present[0] = position 1 (server), present[1] = position 2, ...
+  // present[5] = position 6, present[6+] = the bench queue. Storing it this
+  // way (rather than the serve-rotation's zigzag position order) means a
+  // single whole-array rotation is all rotateCourt needs.
 
   const listEl = document.getElementById("player-list");
   const courtEl = document.getElementById("court");
@@ -205,55 +207,25 @@
   }
 
   function rotateCourt(direction) {
-    // Rotates the whole present queue, not just the current on-court 6, so
-    // bench players cycle onto the court over successive rotations. Absent
-    // players are excluded entirely.
+    // Because present players are stored in sequential position order
+    // (position 1, 2, ... 6, then the bench queue), a plain whole-array
+    // rotation is all that's needed: shifting the front (position 1) to the
+    // back naturally lands it after the bench, and pulls everyone else,
+    // including the front of the bench, up by one slot. No branching for
+    // whether a bench exists is required — it falls out for free.
     const present = players.filter((p) => !p.absent);
     const absent = players.filter((p) => p.absent);
     if (present.length < 2) return;
 
-    players = [...rotatePresentQueue(present, direction), ...absent];
+    if (direction === "forward") {
+      present.push(present.shift());
+    } else {
+      present.unshift(present.pop());
+    }
+
+    players = [...present, ...absent];
     render();
     persistState();
-  }
-
-  function rotatePresentQueue(present, direction) {
-    const n = present.length;
-
-    if (n <= COURT_SIZE) {
-      // No bench to substitute from: pure positional reshuffle, nobody
-      // exits. Forward = standard clockwise serve rotation (2->1->6->5->4->3->2).
-      const queue = present.slice();
-      if (direction === "forward") {
-        queue.unshift(queue.pop());
-      } else {
-        queue.push(queue.shift());
-      }
-      return queue;
-    }
-
-    // With a bench present, the server (position 1) is the one who exits —
-    // rotating out to the back of the bench line — while the front of the
-    // bench subs in at position 6, and the rest of the on-court group shifts
-    // by the usual clockwise serve rotation.
-    if (direction === "forward") {
-      return [
-        present[COURT_SIZE - 1],
-        present[COURT_SIZE],
-        ...present.slice(1, COURT_SIZE - 1),
-        ...present.slice(COURT_SIZE + 1),
-        present[0],
-      ];
-    }
-
-    // Exact inverse of the forward branch above.
-    return [
-      present[n - 1],
-      ...present.slice(2, COURT_SIZE),
-      present[0],
-      present[1],
-      ...present.slice(COURT_SIZE, n - 1),
-    ];
   }
 
   // ---------- rendering ----------
@@ -261,7 +233,8 @@
   function renderCourt() {
     const court = players.filter((p) => !p.absent).slice(0, COURT_SIZE);
 
-    COURT_POSITIONS.forEach((pos, index) => {
+    for (let index = 0; index < COURT_SIZE; index++) {
+      const pos = index + 1;
       const cell = courtEl.querySelector(`.court-cell[data-pos="${pos}"]`);
       const player = court[index];
       cell.classList.toggle("empty", !player);
@@ -290,7 +263,7 @@
         tag.textContent = "Server";
         cell.appendChild(tag);
       }
-    });
+    }
   }
 
   function render() {
