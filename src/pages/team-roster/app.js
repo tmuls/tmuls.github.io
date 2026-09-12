@@ -269,6 +269,18 @@
     }
   }
 
+  function updateLockUI() {
+    lockBtn.textContent = locked ? "🔓 Unlock Roster" : "🔒 Lock Roster";
+    lockBtn.classList.toggle("locked", locked);
+    nameInput.disabled = locked;
+    addForm.querySelector("button[type=submit]").disabled = locked;
+
+    // The court diagram is only meaningful once the lineup is locked in for
+    // play; while still editing the roster, the Absent list is what matters.
+    courtSectionEl.classList.toggle("collapsed", !locked);
+    absentWrapEl.classList.toggle("collapsed", locked);
+  }
+
   function render() {
     listEl.innerHTML = "";
     renderCourt();
@@ -278,14 +290,7 @@
     const onCourt = present.slice(0, COURT_SIZE);
     const onBench = present.slice(COURT_SIZE);
 
-    lockBtn.textContent = locked ? "🔓 Unlock Roster" : "🔒 Lock Roster";
-    lockBtn.classList.toggle("locked", locked);
-    nameInput.disabled = locked;
-    addForm.querySelector("button[type=submit]").disabled = locked;
-
-    // The court diagram is only meaningful once the lineup is locked in for
-    // play; while still editing the roster, the Absent list is what matters.
-    courtSectionEl.classList.toggle("collapsed", !locked);
+    updateLockUI();
 
     listEl.appendChild(sectionLabel(`On Court (${onCourt.length}/${COURT_SIZE})`));
     if (onCourt.length === 0) {
@@ -306,7 +311,6 @@
     // absent-wrap is a persistent element outside #player-list (not rebuilt
     // every render) so its collapse transition has a stable node to animate
     // across, rather than a fresh element that's already born collapsed.
-    absentWrapEl.classList.toggle("collapsed", locked);
     absentInnerEl.innerHTML = "";
     absentInnerEl.appendChild(createDivider("Absent"));
     if (absent.length === 0) {
@@ -563,7 +567,20 @@
   lockBtn.addEventListener("click", () => {
     locked = !locked;
     editingNumberId = null;
-    render();
+    updateLockUI();
+
+    // Toggle existing row elements in place rather than calling render(),
+    // which tears down and rebuilds every row from scratch — a freshly
+    // created row is already born in its final state with nothing to
+    // transition from, so the handle-collapse animation would never play.
+    boardEl.querySelectorAll(".player-row").forEach((row) => {
+      row.classList.toggle("locked", locked);
+      const removeBtn = row.querySelector(".remove-btn");
+      if (removeBtn) removeBtn.disabled = locked;
+      const numberEl = row.querySelector(".player-number");
+      if (numberEl) numberEl.classList.toggle("locked", locked);
+    });
+
     persistState();
   });
 
