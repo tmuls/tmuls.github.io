@@ -4,6 +4,8 @@
   const STORAGE_KEY = "teamRosterData";
   const URL_PARAM = "data";
   const COURT_SIZE = 6;
+  const STATUS_ORDER = ["court", "bench", "absent"];
+  const STATUS_LABELS = { bench: "On Bench", absent: "Absent" };
 
   // On-court list index -> volleyball court position, walking the standard
   // clockwise rotation order (server at position 1, back row, then around).
@@ -20,7 +22,7 @@
   const shareBtn = document.getElementById("share-btn");
   const resetBtn = document.getElementById("reset-btn");
 
-  /** @type {{ id: string, name: string, bench: boolean, number: number }[]} */
+  /** @type {{ id: string, name: string, status: "court" | "bench" | "absent", number: number }[]} */
   let players = [];
   let locked = false;
   let editingNumberId = null;
@@ -59,11 +61,19 @@
       .map((p) => ({
         id: typeof p.id === "string" ? p.id : makeId(),
         name: p.name,
-        bench: p.bench !== false,
+        status: sanitizeStatus(p),
         number: Number.isInteger(p.number) && p.number > 0 ? p.number : null,
       }));
     assignMissingNumbers(list);
     return list;
+  }
+
+  function sanitizeStatus(p) {
+    if (STATUS_ORDER.includes(p.status)) return p.status;
+    // Migrate the old two-state { bench: boolean } shape: bench players
+    // land in the new "bench" tier rather than "absent".
+    if (typeof p.bench === "boolean") return p.bench ? "bench" : "court";
+    return "bench";
   }
 
   function assignMissingNumbers(list) {
@@ -140,7 +150,7 @@
 
   function addPlayer(name) {
     if (locked) return;
-    players.push({ id: makeId(), name: name.trim(), bench: true, number: nextAvailableNumber() });
+    players.push({ id: makeId(), name: name.trim(), status: "bench", number: nextAvailableNumber() });
     render();
     persistState();
   }
@@ -167,39 +177,38 @@
     persistState();
   }
 
-  function movePlayer(id, bench, index) {
+  function movePlayer(id, targetStatus, index) {
     if (locked) return;
     const dragged = players.find((p) => p.id === id);
     if (!dragged) return;
 
-    const activeList = players.filter((p) => !p.bench && p.id !== id);
-    const benchList = players.filter((p) => p.bench && p.id !== id);
-
-    dragged.bench = bench;
-    if (bench) {
-      benchList.splice(index, 0, dragged);
-    } else {
-      activeList.splice(index, 0, dragged);
+    const groups = { court: [], bench: [], absent: [] };
+    for (const p of players) {
+      if (p.id === id) continue;
+      groups[p.status].push(p);
     }
 
-    players = [...activeList, ...benchList];
+    dragged.status = targetStatus;
+    groups[targetStatus].splice(index, 0, dragged);
+
+    players = STATUS_ORDER.flatMap((status) => groups[status]);
     render();
     persistState();
   }
 
   function rotateCourt(direction) {
-    const active = players.filter((p) => !p.bench);
-    const bench = players.filter((p) => p.bench);
-    if (active.length < 2) return;
+    const court = players.filter((p) => p.status === "court");
+    const rest = players.filter((p) => p.status !== "court");
+    if (court.length < 2) return;
 
     // Forward = standard volleyball clockwise rotation (2->1->6->5->4->3->2).
     if (direction === "forward") {
-      active.unshift(active.pop());
+      court.unshift(court.pop());
     } else {
-      active.push(active.shift());
+      court.push(court.shift());
     }
 
-    players = [...active, ...bench];
+    players = [...court, ...rest];
     render();
     persistState();
   }
@@ -207,11 +216,11 @@
   // ---------- rendering ----------
 
   function renderCourt() {
-    const active = players.filter((p) => !p.bench);
+    const court = players.filter((p) => p.status === "court");
 
     COURT_POSITIONS.forEach((pos, index) => {
       const cell = courtEl.querySelector(`.court-cell[data-pos="${pos}"]`);
-      const player = active[index];
+      const player = court[index];
       cell.classList.toggle("empty", !player);
       cell.innerHTML = "";
 
@@ -245,8 +254,9 @@
     listEl.innerHTML = "";
     renderCourt();
 
-    const active = players.filter((p) => !p.bench);
-    const bench = players.filter((p) => p.bench);
+    const court = players.filter((p) => p.status === "court");
+    const bench = players.filter((p) => p.status === "bench");
+    const absent = players.filter((p) => p.status === "absent");
 
     lockedBanner.hidden = !locked;
     lockBtn.textContent = locked ? "🔓 Unlock Roster" : "🔒 Lock Roster";
@@ -254,19 +264,25 @@
     nameInput.disabled = locked;
     addForm.querySelector("button[type=submit]").disabled = locked;
 
-    listEl.appendChild(sectionLabel(`On Court (${active.length}/${COURT_SIZE})`));
-    if (active.length === 0) {
+    listEl.appendChild(sectionLabel(`On Court (${court.length}/${COURT_SIZE})`));
+    if (court.length === 0) {
       listEl.appendChild(emptyRow("No players on the court. Drag a player above the line to send them in."));
     } else {
-      active.forEach((player) => listEl.appendChild(createRow(player)));
+      court.forEach((player) => listEl.appendChild(createRow(player)));
     }
 
-    listEl.appendChild(createDivider());
-
+    listEl.appendChild(createDivider(STATUS_LABELS.bench));
     if (bench.length === 0) {
       listEl.appendChild(emptyRow("No players on the bench."));
     } else {
       bench.forEach((player) => listEl.appendChild(createRow(player)));
+    }
+
+    listEl.appendChild(createDivider(STATUS_LABELS.absent));
+    if (absent.length === 0) {
+      listEl.appendChild(emptyRow("No absent players."));
+    } else {
+      absent.forEach((player) => listEl.appendChild(createRow(player)));
     }
 
     if (editingNumberId) {
@@ -285,7 +301,7 @@
     return el;
   }
 
-  function createDivider() {
+  function createDivider(text) {
     const el = document.createElement("div");
     el.className = "divider-row";
 
@@ -295,7 +311,7 @@
 
     const label = document.createElement("span");
     label.className = "divider-label";
-    label.textContent = "Bench";
+    label.textContent = text;
     el.appendChild(label);
 
     const lineRight = document.createElement("span");
@@ -406,7 +422,7 @@
       if (el === row) continue;
       if (el.classList.contains("player-row")) {
         const player = players.find((p) => p.id === el.dataset.id);
-        others.push({ type: "player", bench: player ? player.bench : true, el, rect: el.getBoundingClientRect() });
+        others.push({ type: "player", status: player ? player.status : "bench", el, rect: el.getBoundingClientRect() });
       } else if (el.classList.contains("divider-row")) {
         others.push({ type: "divider", el, rect: el.getBoundingClientRect() });
       }
@@ -478,16 +494,15 @@
     const { id, ghost, indicator, others } = drag;
 
     const index = drag.lastIndex !== null ? drag.lastIndex : computeInsertionIndex(e.clientY);
-    const dividerPos = others.findIndex((o) => o.type === "divider");
 
-    let bench;
-    let targetIndex;
-    if (dividerPos === -1 || index <= dividerPos) {
-      bench = false;
-      targetIndex = index;
-    } else {
-      bench = true;
-      targetIndex = index - dividerPos - 1;
+    // Every divider before the drop point crosses one more section boundary,
+    // so the number of dividers passed selects which section we landed in.
+    const dividersBefore = others.slice(0, index).filter((o) => o.type === "divider").length;
+    const targetStatus = STATUS_ORDER[Math.min(dividersBefore, STATUS_ORDER.length - 1)];
+
+    let targetIndex = 0;
+    for (let i = 0; i < index; i++) {
+      if (others[i].type === "player" && others[i].status === targetStatus) targetIndex++;
     }
 
     ghost.remove();
@@ -496,7 +511,7 @@
     window.removeEventListener("pointerup", onDragEnd);
     drag = null;
 
-    movePlayer(id, bench, targetIndex);
+    movePlayer(id, targetStatus, targetIndex);
   }
 
   // ---------- misc UI ----------
