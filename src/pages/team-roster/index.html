@@ -20,40 +20,43 @@
     </div>
   </header>
 
-  <div class="court-section">
-    <div id="court" class="court">
-      <div class="court-net">NET</div>
-      <div class="court-row">
-        <div class="court-cell" data-pos="4"></div>
-        <div class="court-cell" data-pos="3"></div>
-        <div class="court-cell" data-pos="2"></div>
-      </div>
-      <div class="court-row">
-        <div class="court-cell" data-pos="5"></div>
-        <div class="court-cell" data-pos="6"></div>
-        <div class="court-cell" data-pos="1"></div>
-      </div>
-      <div class="court-controls">
-        <button id="rotate-back-btn" class="court-rotate-btn" type="button" title="Rotate the lineup backward">
-          <svg class="rotate-icon flip" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 12A9 9 0 1 1 12 3" />
-            <polyline points="12 3 16 3 16 7" />
-          </svg>
-        </button>
-        <button id="rotate-forward-btn" class="court-rotate-btn" type="button" title="Rotate the lineup forward">
-          <svg class="rotate-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 12A9 9 0 1 1 12 3" />
-            <polyline points="12 3 16 3 16 7" />
-          </svg>
-        </button>
+  <div id="court-section" class="court-section collapsible">
+    <div class="collapsible-inner">
+      <div id="court" class="court">
+        <div class="court-net">NET</div>
+        <div class="court-row">
+          <div class="court-cell" data-pos="4"></div>
+          <div class="court-cell" data-pos="3"></div>
+          <div class="court-cell" data-pos="2"></div>
+        </div>
+        <div class="court-row">
+          <div class="court-cell" data-pos="5"></div>
+          <div class="court-cell" data-pos="6"></div>
+          <div class="court-cell" data-pos="1"></div>
+        </div>
+        <div class="court-controls">
+          <button id="rotate-back-btn" class="court-rotate-btn" type="button" title="Rotate the lineup backward">
+            <svg class="rotate-icon flip" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12A9 9 0 1 1 12 3" />
+              <polyline points="12 3 16 3 16 7" />
+            </svg>
+          </button>
+          <button id="rotate-forward-btn" class="court-rotate-btn" type="button" title="Rotate the lineup forward">
+            <svg class="rotate-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12A9 9 0 1 1 12 3" />
+              <polyline points="12 3 16 3 16 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="locked-banner" class="locked-banner" hidden>🔒 Roster locked — add, remove, drag, and number edits are disabled. Rotation still works.</div>
-
   <main class="board">
     <div id="player-list" class="player-list"></div>
+    <div id="absent-wrap" class="absent-wrap collapsible">
+      <div id="absent-inner" class="collapsible-inner"></div>
+    </div>
   </main>
 
   <p class="hint">Drag a player anywhere in the list to reorder them, or past the Absent line to mark them absent. Rotate Forward/Back cycles everyone through on-court and on-bench time — absent players sit out entirely. Everything is saved to your browser and encoded into the page URL so you can share or bookmark your roster.</p>

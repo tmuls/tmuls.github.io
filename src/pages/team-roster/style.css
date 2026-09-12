@@ -97,22 +97,41 @@ button {
   font-weight: 600;
 }
 
-.locked-banner {
-  max-width: 640px;
-  margin: 0 auto 14px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid var(--danger);
-  color: #fecaca;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
+/* Collapse animation: animating grid-template-rows between 1fr and 0fr
+   (rather than max-height or opacity) shrinks the box itself smoothly at
+   any content height, so a bordered/glowing box like .court stays fully
+   opaque and visible right up until it's completely collapsed, instead of
+   fading out early. The inner wrapper needs min-height: 0 to actually
+   shrink with the row track. */
+.collapsible {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 350ms ease-in-out;
+}
+
+.collapsible.collapsed {
+  grid-template-rows: 0fr;
+}
+
+/* Suppressed only for the very first render, so the box doesn't visibly
+   flash open-then-closed before settling into its correct initial state. */
+.collapsible.no-anim {
+  transition: none !important;
+}
+
+.collapsible-inner {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .court-section {
   max-width: 640px;
-  margin: 0 auto 20px;
+  margin: 0 auto;
+  transition: grid-template-rows 350ms ease-in-out, margin-bottom 350ms ease-in-out;
+}
+
+.court-section:not(.collapsed) {
+  margin-bottom: 20px;
 }
 
 .court {
@@ -311,8 +330,8 @@ button {
 .player-number {
   position: relative;
   flex: 0 0 auto;
-  width: 32px;
-  height: 36px;
+  width: 42px;
+  height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -386,6 +405,20 @@ button {
 .remove-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+
+.absent-wrap {
+  transition: grid-template-rows 350ms ease-in-out, margin-top 350ms ease-in-out;
+}
+
+.absent-wrap:not(.collapsed) {
+  margin-top: 6px;
+}
+
+.absent-wrap .collapsible-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .divider-row {

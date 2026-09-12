@@ -16,14 +16,17 @@
   // way (rather than the serve-rotation's zigzag position order) means a
   // single whole-array rotation is all rotateCourt needs.
 
+  const boardEl = document.querySelector(".board");
   const listEl = document.getElementById("player-list");
   const courtEl = document.getElementById("court");
+  const courtSectionEl = document.getElementById("court-section");
+  const absentWrapEl = document.getElementById("absent-wrap");
+  const absentInnerEl = document.getElementById("absent-inner");
   const addForm = document.getElementById("add-form");
   const nameInput = document.getElementById("player-name");
   const rotateBackBtn = document.getElementById("rotate-back-btn");
   const rotateForwardBtn = document.getElementById("rotate-forward-btn");
   const lockBtn = document.getElementById("lock-btn");
-  const lockedBanner = document.getElementById("locked-banner");
   const shareBtn = document.getElementById("share-btn");
   const resetBtn = document.getElementById("reset-btn");
 
@@ -67,7 +70,7 @@
         id: typeof p.id === "string" ? p.id : makeId(),
         name: p.name,
         absent: sanitizeAbsent(p),
-        number: Number.isInteger(p.number) && p.number > 0 ? p.number : null,
+        number: Number.isInteger(p.number) && p.number >= 1 && p.number <= 99 ? p.number : null,
       }));
     assignMissingNumbers(list);
     return list;
@@ -170,7 +173,7 @@
       const player = players.find((p) => p.id === id);
       if (player) {
         const parsed = parseInt(rawValue, 10);
-        if (Number.isInteger(parsed) && parsed > 0) {
+        if (Number.isInteger(parsed) && parsed >= 1 && parsed <= 99) {
           player.number = parsed;
         }
       }
@@ -275,11 +278,14 @@
     const onCourt = present.slice(0, COURT_SIZE);
     const onBench = present.slice(COURT_SIZE);
 
-    lockedBanner.hidden = !locked;
     lockBtn.textContent = locked ? "🔓 Unlock Roster" : "🔒 Lock Roster";
     lockBtn.classList.toggle("locked", locked);
     nameInput.disabled = locked;
     addForm.querySelector("button[type=submit]").disabled = locked;
+
+    // The court diagram is only meaningful once the lineup is locked in for
+    // play; while still editing the roster, the Absent list is what matters.
+    courtSectionEl.classList.toggle("collapsed", !locked);
 
     listEl.appendChild(sectionLabel(`On Court (${onCourt.length}/${COURT_SIZE})`));
     if (onCourt.length === 0) {
@@ -297,15 +303,20 @@
       onBench.forEach((player) => listEl.appendChild(createRow(player)));
     }
 
-    listEl.appendChild(createDivider("Absent"));
+    // absent-wrap is a persistent element outside #player-list (not rebuilt
+    // every render) so its collapse transition has a stable node to animate
+    // across, rather than a fresh element that's already born collapsed.
+    absentWrapEl.classList.toggle("collapsed", locked);
+    absentInnerEl.innerHTML = "";
+    absentInnerEl.appendChild(createDivider("Absent"));
     if (absent.length === 0) {
-      listEl.appendChild(emptyRow("No absent players."));
+      absentInnerEl.appendChild(emptyRow("No absent players."));
     } else {
-      absent.forEach((player) => listEl.appendChild(createRow(player)));
+      absent.forEach((player) => absentInnerEl.appendChild(createRow(player)));
     }
 
     if (editingNumberId) {
-      const input = listEl.querySelector(".player-number-input");
+      const input = boardEl.querySelector(".player-number-input");
       if (input) {
         input.focus();
         input.select();
@@ -355,8 +366,12 @@
       const input = document.createElement("input");
       input.type = "number";
       input.min = "1";
+      input.max = "99";
       input.className = "player-number-input";
       input.value = player.number;
+      input.addEventListener("input", () => {
+        if (input.value.length > 2) input.value = input.value.slice(0, 2);
+      });
       input.addEventListener("blur", () => setPlayerNumber(player.id, input.value));
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") input.blur();
@@ -428,7 +443,7 @@
     const rect = row.getBoundingClientRect();
 
     const others = [];
-    for (const el of listEl.children) {
+    for (const el of boardEl.querySelectorAll(".player-row, .divider-row")) {
       if (el === row) continue;
       if (el.classList.contains("player-row")) {
         const player = players.find((p) => p.id === el.dataset.id);
@@ -481,10 +496,16 @@
 
   function updateIndicator(index) {
     const { others, indicator } = drag;
+    // Insert relative to the anchor's actual parent, not listEl directly —
+    // rows inside a collapsible section (e.g. Absent) are nested one level
+    // deeper, and insertBefore requires a direct child of the target parent.
     if (index >= others.length) {
-      listEl.appendChild(indicator);
+      const last = others[others.length - 1];
+      const container = last ? last.el.parentElement : listEl;
+      container.appendChild(indicator);
     } else {
-      listEl.insertBefore(indicator, others[index].el);
+      const target = others[index].el;
+      target.parentElement.insertBefore(indicator, target);
     }
   }
 
@@ -572,6 +593,18 @@
   const initial = loadInitialState();
   players = initial.players;
   locked = initial.locked;
+
+  // Suppress the collapse transition for the very first render so the
+  // court/absent sections don't visibly flash open-then-closed while
+  // settling into their correct initial state.
+  courtSectionEl.classList.add("no-anim");
+  absentWrapEl.classList.add("no-anim");
   render();
   persistState();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      courtSectionEl.classList.remove("no-anim");
+      absentWrapEl.classList.remove("no-anim");
+    });
+  });
 })();
