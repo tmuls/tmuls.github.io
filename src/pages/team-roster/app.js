@@ -1,4 +1,4 @@
-(() => {
+(async () => {
   "use strict";
 
   const STORAGE_KEY = "teamRosterData";
@@ -35,9 +35,17 @@
   let locked = false;
   let editingNumberId = null;
   let editingNameId = null;
+  // Tracks the most recent persistState() call so the share button can
+  // await it before copying the URL — persistState fires and forgets
+  // everywhere else, since nothing else depends on it having finished.
+  let lastPersist = Promise.resolve();
 
-  // ---------- base64 helpers (UTF-8 safe) ----------
+  // ---------- base64 + compression helpers (UTF-8 safe) ----------
 
+  // Legacy plain (uncompressed) base64 of a JSON string — the format every
+  // link and localStorage entry used before compression was added. Kept
+  // around as: (a) the decode fallback for old links/storage, and (b) the
+  // encode fallback on browsers without CompressionStream.
   function toBase64(str) {
     const bytes = new TextEncoder().encode(str);
     let binary = "";
@@ -53,12 +61,54 @@
     return new TextDecoder().decode(bytes);
   }
 
-  function encodeState(state) {
-    return toBase64(JSON.stringify(state));
+  // URL-safe base64 (- _ instead of + /, no = padding) for the compressed
+  // binary payload, so it drops into a query param with no extra encoding.
+  function bytesToBase64Url(bytes) {
+    let binary = "";
+    bytes.forEach((b) => {
+      binary += String.fromCharCode(b);
+    });
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
 
-  function decodeState(b64) {
-    return JSON.parse(fromBase64(b64));
+  function base64UrlToBytes(str) {
+    const standard = str.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = standard + "=".repeat((4 - (standard.length % 4)) % 4);
+    const binary = atob(padded);
+    return Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  }
+
+  async function compressToBytes(str) {
+    const bytes = new TextEncoder().encode(str);
+    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+
+  async function decompressFromBytes(bytes) {
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return new Response(stream).text();
+  }
+
+  // Every new link/localStorage entry is deflate-compressed then base64url
+  // encoded (shrinks a several-player roster's URL considerably); browsers
+  // without CompressionStream (older Safari) fall back to the legacy plain
+  // encoding instead of breaking.
+  async function encodeState(state) {
+    const json = JSON.stringify(state);
+    if (typeof CompressionStream === "undefined") return toBase64(json);
+    return bytesToBase64Url(await compressToBytes(json));
+  }
+
+  // Tries the compressed format first; falls back to the legacy plain
+  // format so links and localStorage entries from before compression was
+  // added (or written by a browser without CompressionStream) keep working.
+  async function decodeState(encoded) {
+    try {
+      const json = await decompressFromBytes(base64UrlToBytes(encoded));
+      return JSON.parse(json);
+    } catch (err) {
+      return JSON.parse(fromBase64(encoded));
+    }
   }
 
   // ---------- persistence ----------
@@ -106,13 +156,13 @@
     return n;
   }
 
-  function loadInitialState() {
+  async function loadInitialState() {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get(URL_PARAM);
 
     if (fromUrl) {
       try {
-        return sanitizeState(decodeState(fromUrl));
+        return sanitizeState(await decodeState(fromUrl));
       } catch (err) {
         console.warn("Could not decode roster data from URL, falling back.", err);
       }
@@ -121,7 +171,7 @@
     const fromStorage = localStorage.getItem(STORAGE_KEY);
     if (fromStorage) {
       try {
-        return sanitizeState(decodeState(fromStorage));
+        return sanitizeState(await decodeState(fromStorage));
       } catch (err) {
         console.warn("Could not decode roster data from localStorage.", err);
       }
@@ -141,7 +191,12 @@
   }
 
   function persistState() {
-    const encoded = encodeState({ players, locked });
+    lastPersist = persistStateAsync();
+    return lastPersist;
+  }
+
+  async function persistStateAsync() {
+    const encoded = await encodeState({ players, locked });
     localStorage.setItem(STORAGE_KEY, encoded);
 
     const url = new URL(window.location.href);
@@ -825,6 +880,10 @@
 
   shareBtn.addEventListener("click", async () => {
     try {
+      // The URL is updated asynchronously (compressing takes a tick), so
+      // wait for the latest persist to land before copying it — otherwise
+      // a share click right after an edit could copy a stale URL.
+      await lastPersist;
       await navigator.clipboard.writeText(window.location.href);
       shareBtn.textContent = "Link Copied!";
     } catch (err) {
@@ -846,7 +905,7 @@
 
   // ---------- init ----------
 
-  const initial = loadInitialState();
+  const initial = await loadInitialState();
   players = initial.players;
   locked = initial.locked;
 
