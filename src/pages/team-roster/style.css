@@ -44,12 +44,14 @@ body {
   margin-right: auto;
 }
 
-/* Filled-stencil volleyball: a solid silhouette (.volley-fill, colored via
-   currentColor so each context can just set `color`) with curved seam paths
-   (.volley-seam) stroked in whatever sits directly behind the icon, so the
-   seams read as cutouts rather than drawn lines — same technique everywhere
-   this icon appears (header logo, locked-row serving indicator), just with
-   different `color` / `--seam-color` per background. */
+/* Filled-stencil volleyball (geometry lives once as a <symbol>, see the
+   top of <body>): the ball's panel shapes (.volley-fill) are colored via
+   currentColor so each context can just set `color`, and sit on top of a
+   solid background blob (.volley-seam) colored to match whatever's behind
+   the icon, so the gaps between panels read as cutouts rather than drawn
+   lines — same technique everywhere this icon appears (header logo,
+   locked-row serving indicator), just with different `color` /
+   `--seam-color` per background. */
 .volley-icon {
   flex: 0 0 auto;
   display: block;
@@ -60,10 +62,7 @@ body {
 }
 
 .volley-seam {
-  fill: none;
-  stroke: var(--seam-color, var(--bg));
-  stroke-width: 2.2;
-  stroke-linecap: round;
+  fill: var(--seam-color, var(--bg));
 }
 
 .app-logo {

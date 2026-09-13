@@ -584,16 +584,13 @@
     return badge;
   }
 
-  // Same filled-stencil volleyball as the header logo (index.html): a solid
-  // silhouette (.volley-fill) with curved seam paths (.volley-seam) stroked
-  // in whatever color sits behind the icon in each context, so the seams
-  // read as cutouts rather than drawn lines.
+  // Same volleyball as the header logo — its geometry lives once as a
+  // <symbol> in index.html and is referenced here by <use>, since the path
+  // data is large and both places need to recolor it per context (currentColor
+  // for the ball, --seam-color for whatever sits behind the gaps).
   const VOLLEY_SVG = `
-    <svg class="volley-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <circle class="volley-fill" cx="12" cy="12" r="11"></circle>
-      <path class="volley-seam" d="M12 1C16 6 16 18 12 23"></path>
-      <path class="volley-seam" d="M2.8 5.9C9 10 15 14 21.2 18.1"></path>
-      <path class="volley-seam" d="M2.8 18.1C9 14 15 10 21.2 5.9"></path>
+    <svg class="volley-icon" aria-hidden="true">
+      <use href="#volley-icon-symbol"></use>
     </svg>
   `;
 
