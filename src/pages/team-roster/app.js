@@ -261,6 +261,17 @@
     renderSavedRosters();
   }
 
+  async function loadSavedRoster(entry) {
+    const state = sanitizeState(await decodeState(entry.encoded));
+    players = state.players;
+    locked = state.locked;
+    editingNumberId = null;
+    editingNameId = null;
+    render();
+    persistState();
+    closeMenu();
+  }
+
   function deleteSavedRoster(name) {
     if (!window.confirm(`Delete saved roster "${name}"? This cannot be undone.`)) return;
     const saved = loadSavedRosters().filter((r) => r.name !== name);
@@ -298,7 +309,8 @@
       const name = document.createElement("span");
       name.className = "saved-roster-name";
       name.textContent = entry.name;
-      name.title = entry.name;
+      name.title = "Tap to load this roster";
+      name.addEventListener("click", () => loadSavedRoster(entry));
       row.appendChild(name);
 
       const shareRowBtn = document.createElement("button");
