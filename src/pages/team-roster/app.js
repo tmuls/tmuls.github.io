@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "teamRosterData";
+  const SAVED_ROSTERS_KEY = "teamRosterSavedRosters";
   const URL_PARAM = "data";
   const COURT_SIZE = 6;
 
@@ -29,6 +30,10 @@
   const lockBtn = document.getElementById("lock-btn");
   const shareBtn = document.getElementById("share-btn");
   const resetBtn = document.getElementById("reset-btn");
+  const menuBtn = document.getElementById("menu-btn");
+  const menuPanel = document.getElementById("menu-panel");
+  const saveRosterBtn = document.getElementById("save-roster-btn");
+  const savedRostersListEl = document.getElementById("saved-rosters-list");
 
   /** @type {{ id: string, name: string, absent: boolean, number: number }[]} */
   let players = [];
@@ -206,6 +211,125 @@
       url.searchParams.delete(URL_PARAM);
     }
     window.history.replaceState(null, "", url.toString());
+  }
+
+  // ---------- saved rosters (named snapshots, separate from the single
+  // live-editing roster above) ----------
+
+  // An array, not a { name: ... } map: object keys that look numeric
+  // ("2024") iterate in numeric order regardless of insertion order, which
+  // would silently reorder the saved-rosters list.
+  function loadSavedRosters() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(SAVED_ROSTERS_KEY));
+      return Array.isArray(raw) ? raw.filter((r) => r && typeof r.name === "string" && typeof r.encoded === "string") : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function writeSavedRosters(list) {
+    localStorage.setItem(SAVED_ROSTERS_KEY, JSON.stringify(list));
+  }
+
+  function savedRosterShareUrl(encoded) {
+    const url = new URL(window.location.href);
+    url.searchParams.set(URL_PARAM, encoded);
+    return url.toString();
+  }
+
+  async function saveCurrentRoster() {
+    const name = window.prompt("Save this roster as:");
+    if (!name) return;
+    const trimmed = name.trim();
+    if (!trimmed) return;
+
+    const saved = loadSavedRosters();
+    const existingIndex = saved.findIndex((r) => r.name === trimmed);
+    if (existingIndex !== -1) {
+      const overwrite = window.confirm(`A roster named "${trimmed}" already exists. Overwrite it?`);
+      if (!overwrite) return;
+    }
+
+    const encoded = await encodeState({ players, locked });
+    if (existingIndex !== -1) {
+      saved[existingIndex] = { name: trimmed, encoded };
+    } else {
+      saved.push({ name: trimmed, encoded });
+    }
+    writeSavedRosters(saved);
+    renderSavedRosters();
+  }
+
+  function deleteSavedRoster(name) {
+    if (!window.confirm(`Delete saved roster "${name}"? This cannot be undone.`)) return;
+    const saved = loadSavedRosters().filter((r) => r.name !== name);
+    writeSavedRosters(saved);
+    renderSavedRosters();
+  }
+
+  async function shareSavedRoster(entry, btnEl) {
+    const url = savedRosterShareUrl(entry.encoded);
+    const originalLabel = btnEl.textContent;
+    try {
+      await navigator.clipboard.writeText(url);
+      btnEl.textContent = "Copied!";
+    } catch (err) {
+      btnEl.textContent = "Copy failed";
+    }
+    setTimeout(() => {
+      btnEl.textContent = originalLabel;
+    }, 1500);
+  }
+
+  function renderSavedRosters() {
+    const saved = loadSavedRosters();
+    savedRostersListEl.innerHTML = "";
+
+    if (saved.length === 0) {
+      savedRostersListEl.appendChild(emptyRow("No rosters have been saved"));
+      return;
+    }
+
+    saved.forEach((entry) => {
+      const row = document.createElement("div");
+      row.className = "saved-roster-row";
+
+      const name = document.createElement("span");
+      name.className = "saved-roster-name";
+      name.textContent = entry.name;
+      name.title = entry.name;
+      row.appendChild(name);
+
+      const shareRowBtn = document.createElement("button");
+      shareRowBtn.type = "button";
+      shareRowBtn.className = "saved-roster-share-btn";
+      shareRowBtn.textContent = "Share";
+      shareRowBtn.title = "Copy a shareable link for this saved roster";
+      shareRowBtn.addEventListener("click", () => shareSavedRoster(entry, shareRowBtn));
+      row.appendChild(shareRowBtn);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "remove-btn";
+      deleteBtn.textContent = "×";
+      deleteBtn.title = "Delete this saved roster";
+      deleteBtn.addEventListener("click", () => deleteSavedRoster(entry.name));
+      row.appendChild(deleteBtn);
+
+      savedRostersListEl.appendChild(row);
+    });
+  }
+
+  function openMenu() {
+    menuPanel.hidden = false;
+    menuBtn.setAttribute("aria-expanded", "true");
+    renderSavedRosters();
+  }
+
+  function closeMenu() {
+    menuPanel.hidden = true;
+    menuBtn.setAttribute("aria-expanded", "false");
   }
 
   // ---------- state mutation ----------
@@ -689,7 +813,9 @@
       removeBtn.className = "remove-btn";
       removeBtn.textContent = "×";
       removeBtn.title = "Remove player";
-      removeBtn.addEventListener("click", () => removePlayer(player.id));
+      removeBtn.addEventListener("click", () => {
+        if (confirm(`Remove ${player.name} from the roster?`)) removePlayer(player.id);
+      });
       return removeBtn;
     }
 
@@ -901,6 +1027,26 @@
     players = [];
     render();
     persistState();
+  });
+
+  menuBtn.addEventListener("click", () => {
+    if (menuPanel.hidden) openMenu();
+    else closeMenu();
+  });
+
+  saveRosterBtn.addEventListener("click", () => {
+    saveCurrentRoster();
+  });
+
+  // Close on an outside click or Escape, like any dropdown menu.
+  document.addEventListener("click", (e) => {
+    if (menuPanel.hidden) return;
+    if (menuPanel.contains(e.target) || menuBtn.contains(e.target)) return;
+    closeMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !menuPanel.hidden) closeMenu();
   });
 
   // ---------- init ----------

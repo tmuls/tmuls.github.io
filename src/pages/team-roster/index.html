@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Volley Roster</title>
+<title>VolleyRoster</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -36,20 +36,42 @@
   </svg>
 
   <header class="app-header">
-    <h1>
-      <svg class="volley-icon app-logo" aria-hidden="true">
-        <use href="#volley-icon-symbol"></use>
-      </svg>
-      Volley Roster
-    </h1>
-    <form id="add-form" class="add-form">
-      <input type="text" id="player-name" placeholder="Player name" maxlength="40" required />
-      <button type="submit">Add Player</button>
-    </form>
-    <div class="header-actions">
-      <button id="lock-btn" type="button" title="Lock or unlock roster changes">🔒 Lock Roster</button>
-      <button id="share-btn" type="button" title="Copy a shareable link with the current roster">Copy Share Link</button>
-      <button id="reset-btn" type="button" title="Remove all players">Reset</button>
+    <div class="title-bar">
+      <h1>
+        <svg class="volley-icon app-logo" aria-hidden="true">
+          <use href="#volley-icon-symbol"></use>
+        </svg>
+        VolleyRoster
+      </h1>
+      <div class="menu-wrap">
+        <button id="menu-btn" class="hamburger-btn" type="button" aria-label="Menu" aria-haspopup="true" aria-expanded="false" title="Menu">
+          <svg class="hamburger-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="17" x2="20" y2="17"></line>
+          </svg>
+        </button>
+        <div id="menu-panel" class="menu-panel" hidden>
+          <button id="save-roster-btn" class="menu-item" type="button">Save current roster</button>
+          <div class="divider-row">
+            <span class="divider-line"></span>
+            <span class="divider-label">Saved Rosters</span>
+            <span class="divider-line"></span>
+          </div>
+          <div id="saved-rosters-list" class="saved-rosters-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <form id="add-form" class="add-form">
+        <input type="text" id="player-name" placeholder="Player name" maxlength="40" required />
+        <button type="submit">Add Player</button>
+      </form>
+      <div class="header-actions">
+        <button id="lock-btn" type="button" title="Lock or unlock roster changes">🔒 Lock Roster</button>
+        <button id="share-btn" type="button" title="Copy a shareable link with the current roster">Copy Share Link</button>
+        <button id="reset-btn" type="button" title="Remove all players">Reset</button>
+      </div>
     </div>
   </header>
 
