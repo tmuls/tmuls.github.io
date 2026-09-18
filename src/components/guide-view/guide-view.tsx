@@ -30,20 +30,44 @@ function sidebarEntryLabel(entry: SidebarEntry): string {
   return props.title || humanizeId(entry.component);
 }
 
+interface GuideVideo {
+  id: string;
+  label?: string;
+}
+
 const YOUTUBE_RE = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/g;
 
-function extractYoutubeIds(text: string): string[] {
-  const ids: string[] = [];
+// The same URL inside an HTML comment, which is how a guide references a
+// demo without the raw link showing up mid-paragraph - the player is drawn
+// at the bottom instead. The comment can name the video:
+//   <!-- https://youtu.be/ID -->           just the player
+//   <!-- Madness: https://youtu.be/ID -->  titled "Madness"
+// A guide covering more than one build needs those names, otherwise its
+// demos are a row of identical play buttons.
+const LABELED_YOUTUBE_RE =
+  /<!--\s*(?:([^\n]*?)\s*:\s*)?(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})[^\n]*?-->/g;
+
+function extractVideos(text: string): GuideVideo[] {
+  const labels: Record<string, string> = {};
+  let labeled: RegExpExecArray | null;
+  LABELED_YOUTUBE_RE.lastIndex = 0;
+  while ((labeled = LABELED_YOUTUBE_RE.exec(text))) {
+    if (labeled[1]) {
+      labels[labeled[2]] = labeled[1].trim();
+    }
+  }
+
+  const videos: GuideVideo[] = [];
   const seen = new Set<string>();
   let match: RegExpExecArray | null;
   YOUTUBE_RE.lastIndex = 0;
   while ((match = YOUTUBE_RE.exec(text))) {
     if (!seen.has(match[1])) {
       seen.add(match[1]);
-      ids.push(match[1]);
+      videos.push({ id: match[1], label: labels[match[1]] });
     }
   }
-  return ids;
+  return videos;
 }
 
 function markExternalLinks(html: string): string {
@@ -87,7 +111,7 @@ export class GuideView {
   @Prop() guideId!: string;
   @State() title = '';
   @State() html = '';
-  @State() videoIds: string[] = [];
+  @State() videos: GuideVideo[] = [];
   @State() sidebar: SidebarEntry[] = [];
   @State() expandedSidebar: boolean[] = [];
   @State() playingVideos: string[] = [];
@@ -118,7 +142,7 @@ export class GuideView {
       }
 
       const raw = await mdRes.text();
-      this.videoIds = extractYoutubeIds(raw);
+      this.videos = extractVideos(raw);
       this.html = markExternalLinks(marked.parse(raw) as string);
       this.title = await loadGuideTitle(this.guideId);
 
@@ -148,31 +172,32 @@ export class GuideView {
         <h1 class="title is-2 has-text-light">{this.title}</h1>
         <div class="content guide-content" innerHTML={this.html}></div>
 
-        {this.videoIds.length > 0 && (
+        {this.videos.length > 0 && (
           <div class="guide-video-section">
-            <h2 class="title is-4 has-text-light">{this.videoIds.length > 1 ? 'Demos' : 'YouTube Demo'}</h2>
-            {this.videoIds.map((videoId) =>
-              this.playingVideos.includes(videoId) ? (
+            <h2 class="title is-4 has-text-light">{this.videos.length > 1 ? 'Demos' : 'YouTube Demo'}</h2>
+            {this.videos.map((video) => (
+              <div class="guide-video">
+                {video.label && <p class="guide-video-label">{video.label}</p>}
                 <div class="guide-video-embed">
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  ></iframe>
+                  {this.playingVideos.includes(video.id) ? (
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1`}
+                      title={video.label ? `${video.label} demo` : 'YouTube video player'}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    ></iframe>
+                  ) : (
+                    <button
+                      type="button"
+                      class="guide-video-facade"
+                      aria-label={video.label ? `Play ${video.label} demo` : 'Play video'}
+                      onClick={() => this.playVideo(video.id)}
+                    >
+                      <span class="guide-video-play-icon" aria-hidden="true"></span>
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <div class="guide-video-embed">
-                  <button
-                    type="button"
-                    class="guide-video-facade"
-                    aria-label="Play video"
-                    onClick={() => this.playVideo(videoId)}
-                  >
-                    <span class="guide-video-play-icon" aria-hidden="true"></span>
-                  </button>
-                </div>
-              ),
-            )}
+              </div>
+            ))}
           </div>
         )}
       </Fragment>
