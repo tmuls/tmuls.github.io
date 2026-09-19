@@ -21,6 +21,9 @@
   const listEl = document.getElementById("player-list");
   const courtEl = document.getElementById("court");
   const courtSectionEl = document.getElementById("court-section");
+  const courtToggleBtn = document.getElementById("court-toggle-btn");
+  const courtCollapsibleEl = document.getElementById("court-collapsible");
+  const courtToggleArrowEl = courtToggleBtn.querySelector(".court-toggle-arrow");
   const absentWrapEl = document.getElementById("absent-wrap");
   const absentInnerEl = document.getElementById("absent-inner");
   const addForm = document.getElementById("add-form");
@@ -44,6 +47,10 @@
   // await it before copying the URL — persistState fires and forgets
   // everywhere else, since nothing else depends on it having finished.
   let lastPersist = Promise.resolve();
+  // Purely a UI preference (not part of the roster data itself), so it
+  // isn't persisted — collapsing the court diagram just tucks it out of the
+  // way while locked in for play, it doesn't survive a reload.
+  let courtManuallyCollapsed = false;
 
   // ---------- base64 + compression helpers (UTF-8 safe) ----------
 
@@ -989,6 +996,13 @@
 
   rotateBackBtn.addEventListener("click", () => rotateCourt("backward"));
   rotateForwardBtn.addEventListener("click", () => rotateCourt("forward"));
+
+  courtToggleBtn.addEventListener("click", () => {
+    courtManuallyCollapsed = !courtManuallyCollapsed;
+    courtCollapsibleEl.classList.toggle("collapsed", courtManuallyCollapsed);
+    courtToggleArrowEl.classList.toggle("collapsed", courtManuallyCollapsed);
+    courtToggleBtn.setAttribute("aria-expanded", String(!courtManuallyCollapsed));
+  });
 
   lockBtn.addEventListener("click", () => {
     locked = !locked;

@@ -77,31 +77,41 @@
 
   <div id="court-section" class="court-section collapsible">
     <div class="collapsible-inner">
-      <div id="court" class="court">
-        <div class="court-net">NET</div>
-        <div class="court-row">
-          <div class="court-cell" data-pos="4"></div>
-          <div class="court-cell" data-pos="3"></div>
-          <div class="court-cell" data-pos="2"></div>
-        </div>
-        <div class="court-row">
-          <div class="court-cell" data-pos="5"></div>
-          <div class="court-cell" data-pos="6"></div>
-          <div class="court-cell" data-pos="1"></div>
-        </div>
-        <div class="court-controls">
-          <button id="rotate-back-btn" class="court-rotate-btn" type="button" title="Rotate the lineup backward">
-            <svg class="rotate-icon flip" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M21 12A9 9 0 1 1 12 3" />
-              <polyline points="12 3 16 3 16 7" />
-            </svg>
-          </button>
-          <button id="rotate-forward-btn" class="court-rotate-btn" type="button" title="Rotate the lineup forward">
-            <svg class="rotate-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M21 12A9 9 0 1 1 12 3" />
-              <polyline points="12 3 16 3 16 7" />
-            </svg>
-          </button>
+      <button id="court-toggle-btn" class="court-toggle-btn" type="button" aria-expanded="true" aria-controls="court-collapsible" title="Show or hide the court diagram">
+        <span>On Court</span>
+        <svg class="court-toggle-arrow" viewBox="0 0 24 24" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div id="court-collapsible" class="collapsible">
+        <div class="collapsible-inner">
+          <div id="court" class="court">
+            <div class="court-net">NET</div>
+            <div class="court-row">
+              <div class="court-cell" data-pos="4"></div>
+              <div class="court-cell" data-pos="3"></div>
+              <div class="court-cell" data-pos="2"></div>
+            </div>
+            <div class="court-row">
+              <div class="court-cell" data-pos="5"></div>
+              <div class="court-cell" data-pos="6"></div>
+              <div class="court-cell" data-pos="1"></div>
+            </div>
+            <div class="court-controls">
+              <button id="rotate-back-btn" class="court-rotate-btn" type="button" title="Rotate the lineup backward">
+                <svg class="rotate-icon flip" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21 12A9 9 0 1 1 12 3" />
+                  <polyline points="12 3 16 3 16 7" />
+                </svg>
+              </button>
+              <button id="rotate-forward-btn" class="court-rotate-btn" type="button" title="Rotate the lineup forward">
+                <svg class="rotate-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21 12A9 9 0 1 1 12 3" />
+                  <polyline points="12 3 16 3 16 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
