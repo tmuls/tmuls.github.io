@@ -21,9 +21,11 @@
   const listEl = document.getElementById("player-list");
   const courtEl = document.getElementById("court");
   const courtSectionEl = document.getElementById("court-section");
-  const courtToggleBtn = document.getElementById("court-toggle-btn");
-  const courtCollapsibleEl = document.getElementById("court-collapsible");
-  const courtToggleArrowEl = courtToggleBtn.querySelector(".court-toggle-arrow");
+  const onCourtToggleBtn = document.getElementById("on-court-toggle-btn");
+  const onCourtCollapsibleEl = document.getElementById("on-court-collapsible");
+  const onCourtInnerEl = document.getElementById("on-court-inner");
+  const onCourtLabelEl = document.getElementById("on-court-label");
+  const onCourtToggleArrowEl = onCourtToggleBtn.querySelector(".section-toggle-arrow");
   const absentWrapEl = document.getElementById("absent-wrap");
   const absentInnerEl = document.getElementById("absent-inner");
   const addForm = document.getElementById("add-form");
@@ -48,9 +50,12 @@
   // everywhere else, since nothing else depends on it having finished.
   let lastPersist = Promise.resolve();
   // Purely a UI preference (not part of the roster data itself), so it
-  // isn't persisted — collapsing the court diagram just tucks it out of the
-  // way while locked in for play, it doesn't survive a reload.
-  let courtManuallyCollapsed = false;
+  // isn't persisted — collapsing the On Court list just tucks it out of the
+  // way while locked in for play (the court diagram already shows the same
+  // info visually), it doesn't survive a reload. Only meaningful while
+  // locked: dragging players in/out of On Court requires seeing the list,
+  // so it always renders expanded while unlocked regardless of this flag.
+  let onCourtManuallyCollapsed = false;
 
   // ---------- base64 + compression helpers (UTF-8 safe) ----------
 
@@ -637,6 +642,16 @@
     // play; while still editing the roster, the Absent list is what matters.
     courtSectionEl.classList.toggle("collapsed", !locked);
     absentWrapEl.classList.toggle("collapsed", locked);
+
+    // The On Court list's manual collapse only applies while locked — it
+    // always renders expanded while unlocked, since dragging players in/out
+    // of it requires seeing the list. Disabling the button (rather than just
+    // guarding the click handler) also gives it a visibly inactive state.
+    const onCourtCollapsed = locked && onCourtManuallyCollapsed;
+    onCourtCollapsibleEl.classList.toggle("collapsed", onCourtCollapsed);
+    onCourtToggleArrowEl.classList.toggle("collapsed", onCourtCollapsed);
+    onCourtToggleBtn.setAttribute("aria-expanded", String(!onCourtCollapsed));
+    onCourtToggleBtn.disabled = !locked;
   }
 
   function render() {
@@ -650,11 +665,15 @@
 
     updateLockUI();
 
-    listEl.appendChild(sectionLabel(`On Court (${onCourt.length}/${COURT_SIZE})`));
+    // on-court-inner is a persistent element outside #player-list (not
+    // rebuilt every render), same reasoning as absent-inner below — its
+    // collapse transition needs a stable node to animate across.
+    onCourtLabelEl.textContent = `On Court (${onCourt.length}/${COURT_SIZE})`;
+    onCourtInnerEl.innerHTML = "";
     if (onCourt.length === 0) {
-      listEl.appendChild(emptyRow("No players on the court. Drag a player up to send them in."));
+      onCourtInnerEl.appendChild(emptyRow("No players on the court. Drag a player up to send them in."));
     } else {
-      onCourt.forEach((player, index) => listEl.appendChild(createRow(player, { isServing: index === 0 })));
+      onCourt.forEach((player, index) => onCourtInnerEl.appendChild(createRow(player, { isServing: index === 0 })));
     }
 
     // Purely a visual marker of the on-court/on-bench boundary within the
@@ -692,13 +711,6 @@
         input.select();
       }
     }
-  }
-
-  function sectionLabel(text) {
-    const el = document.createElement("div");
-    el.className = "section-label";
-    el.textContent = text;
-    return el;
   }
 
   function createDivider(text, { subDivider = false } = {}) {
@@ -997,11 +1009,11 @@
   rotateBackBtn.addEventListener("click", () => rotateCourt("backward"));
   rotateForwardBtn.addEventListener("click", () => rotateCourt("forward"));
 
-  courtToggleBtn.addEventListener("click", () => {
-    courtManuallyCollapsed = !courtManuallyCollapsed;
-    courtCollapsibleEl.classList.toggle("collapsed", courtManuallyCollapsed);
-    courtToggleArrowEl.classList.toggle("collapsed", courtManuallyCollapsed);
-    courtToggleBtn.setAttribute("aria-expanded", String(!courtManuallyCollapsed));
+  onCourtToggleBtn.addEventListener("click", () => {
+    onCourtManuallyCollapsed = !onCourtManuallyCollapsed;
+    onCourtCollapsibleEl.classList.toggle("collapsed", onCourtManuallyCollapsed);
+    onCourtToggleArrowEl.classList.toggle("collapsed", onCourtManuallyCollapsed);
+    onCourtToggleBtn.setAttribute("aria-expanded", String(!onCourtManuallyCollapsed));
   });
 
   lockBtn.addEventListener("click", () => {

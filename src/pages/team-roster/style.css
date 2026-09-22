@@ -271,12 +271,14 @@ button {
   margin-bottom: 20px;
 }
 
-.court-toggle-btn {
+/* Generic clickable section-header pattern (header bar + rotating chevron),
+   reused wherever a section is collapsible — e.g. the On Court list below,
+   while the roster is locked. */
+.section-toggle-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 8px;
   padding: 4px 2px;
   border: none;
   background: none;
@@ -288,11 +290,16 @@ button {
   cursor: pointer;
 }
 
-.court-toggle-btn:hover {
+.section-toggle-btn:hover {
   color: var(--text);
 }
 
-.court-toggle-arrow {
+.section-toggle-btn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.section-toggle-arrow {
   width: 18px;
   height: 18px;
   fill: none;
@@ -303,7 +310,7 @@ button {
   transition: transform 250ms ease-in-out;
 }
 
-.court-toggle-arrow.collapsed {
+.section-toggle-arrow.collapsed {
   transform: rotate(-90deg);
 }
 
@@ -451,19 +458,20 @@ button {
   margin: 0 auto;
 }
 
-.player-list {
+.on-court-wrap {
+  margin-bottom: 6px;
+}
+
+#on-court-inner {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.section-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin: 4px 2px 2px;
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .player-row {
